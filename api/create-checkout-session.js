@@ -1,158 +1,190 @@
 // ============================================================
-// Serverless function (deploy target: Vercel)
-// Creates a real Stripe Checkout session from the cart sent by the browser.
+// Serverless function (Vercel)
+// Creates a HitPay Payment Request from the cart sent by the browser.
 //
-// Setup required before this works:
-//   1. Create a Stripe account: https://dashboard.stripe.com/register
-//   2. Get your Secret key from Developers > API keys
-//   3. In your Vercel project, add an Environment Variable:
-//        STRIPE_SECRET_KEY = sk_test_xxxxxxxx   (use the TEST key first)
-//   4. Connect an Upstash Redis store to the project (needed for discount
-//      codes — see README.md "Discount codes" section)
-//   5. Redeploy after adding the environment variable.
+// Required Vercel Environment Variables:
+//   HITPAY_API_KEY  = your HitPay API key (from Dashboard → Developers → API Keys)
+//                     Use the Sandbox key (usually starts with "tes") for testing first.
+//   HITPAY_SALT     = (optional) webhook salt, for later webhook verification
 //
-// While STRIPE_SECRET_KEY is a "sk_test_..." key, no real money moves —
-// use Stripe's test card 4242 4242 4242 4242 (any future date, any CVC)
-// to test the full flow safely. Switch to the "sk_live_..." key only
-// once you've tested a full order end to end.
+// Optional:
+//   HITPAY_API_BASE = override API base URL
+//                     default: sandbox if key looks like test, else production
 //
-// Discount codes: the browser only ever sends the CODE (a string), never
-// a discount amount. This function looks the code up in Upstash Redis,
-// verifies it exists and hasn't been used, computes the discount itself,
-// and marks the code as used at the moment a Checkout session is created
-// for it — so the same code cannot be applied twice, even by the same
-// person opening two tabs. (Trade-off: if someone applies a code and then
-// abandons payment without completing it, that code is now spent. This
-// keeps the logic simple; ask if you'd like it upgraded to only redeem
-// on confirmed payment via a Stripe webhook instead.)
+// Also needs the existing Upstash Redis vars for discount codes:
+//   KV_REST_API_URL, KV_REST_API_TOKEN
+//
+// Flow:
+//   1. Browser POSTs { cart, discountCode }
+//   2. This function recalculates total + shipping + discount on the server
+//   3. Creates a HitPay payment request
+//   4. Returns { url } → browser redirects customer to HitPay checkout
+//   5. After payment, HitPay redirects to success.html
 // ============================================================
 
-const Stripe = require("stripe");
 const { Redis } = require("@upstash/redis");
+
 const kv = new Redis({
   url: process.env.KV_REST_API_URL,
   token: process.env.KV_REST_API_TOKEN,
 });
 
-// 运费规则 — 必须跟 script.js 顶部那两个常数保持一致，
-// 因为购物车画面显示的金额，跟这里真正跟Stripe收的钱，要对得上。
-// 如果改了 script.js 里的门槛/运费，记得这里也要跟着改。
+// 运费规则 — 必须跟 script.js 顶部那两个常数保持一致
 const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // S$100.00
 const SHIPPING_FEE_CENTS = 500; // S$5.00
+
+function getHitPayBaseUrl(apiKey) {
+  if (process.env.HITPAY_API_BASE) return process.env.HITPAY_API_BASE.replace(/\/$/, "");
+  // Sandbox keys commonly start with "tes" / "test"
+  const isSandbox = /^tes/i.test(apiKey || "");
+  return isSandbox
+    ? "https://api.sandbox.hit-pay.com"
+    : "https://api.hit-pay.com";
+}
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) {
-    return res.status(500).json({ error: "STRIPE_SECRET_KEY is missing." });
+  const apiKey = process.env.HITPAY_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: "HITPAY_API_KEY is missing. Add it in Vercel Environment Variables." });
   }
 
-  const stripe = Stripe(secretKey);
-
   try {
-    const { cart, discountCode } = req.body;
+    const { cart, discountCode } = req.body || {};
 
     if (!Array.isArray(cart) || cart.length === 0) {
       return res.status(400).json({ error: "Cart is empty" });
     }
 
-    // 1. 安全计算原价总额 (Cents) — 完全基于服务器自己记的价格逻辑
+    // 1. 服务器端重新计算商品小计（不信任前端传来的总价）
     const rawTotalCents = cart.reduce((sum, item) => {
       const price = Number(item.priceCents || item.price || 0);
       const qty = Number(item.quantity || item.qty || 1);
       return sum + price * qty;
     }, 0);
 
-    // 2. 如果有折扣码，向 KV 查证：存在、未使用过，才算数
+    if (rawTotalCents <= 0) {
+      return res.status(400).json({ error: "Invalid cart total" });
+    }
+
+    // 2. 折扣码验证（继续用现有 Redis）
     let discountRecord = null;
     let discountKey = null;
 
     if (discountCode && typeof discountCode === "string") {
       discountKey = `discount:${discountCode.trim().toUpperCase()}`;
-      const record = await kv.get(discountKey);
-      if (record && !record.used) {
-        discountRecord = record;
+      try {
+        const record = await kv.get(discountKey);
+        if (record && !record.used) {
+          discountRecord = record;
+        }
+      } catch (e) {
+        console.warn("Discount lookup failed:", e.message);
       }
-      // 如果代码不存在或已被使用，静默忽略折扣（不让下单失败），
-      // 前端 Apply 按钮那一步已经先跟人说过"无效/已使用"了。
     }
 
     const hasValidDiscount = !!discountRecord && rawTotalCents > 0;
     let finalTotalCents = rawTotalCents;
+
     if (hasValidDiscount) {
       if (discountRecord.type === "percent") {
-        finalTotalCents = Math.round(rawTotalCents * (1 - discountRecord.value / 100));
+        finalTotalCents = Math.round(rawTotalCents * (1 - Number(discountRecord.value) / 100));
       } else if (discountRecord.type === "fixed") {
-        finalTotalCents = rawTotalCents - Math.round(discountRecord.value * 100);
+        // fixed value is in dollars (e.g. 5 = S$5)
+        finalTotalCents = rawTotalCents - Math.round(Number(discountRecord.value) * 100);
       }
-      finalTotalCents = Math.max(1, finalTotalCents); // Stripe需要单价至少1分钱
+      finalTotalCents = Math.max(1, finalTotalCents);
     }
-    const discountRatio = hasValidDiscount ? finalTotalCents / rawTotalCents : 1;
 
-    // 3. 生成符合 Stripe 规范的 line_items
-    const line_items = cart.map((item) => {
-      const basePrice = Number(item.priceCents || item.price || 0);
-      let finalPrice = hasValidDiscount ? Math.round(basePrice * discountRatio) : basePrice;
-      if (finalPrice < 1) finalPrice = 1;
+    // 3. 运费（用折扣后金额判断免运费）
+    const shippingFeeCents =
+      finalTotalCents >= FREE_SHIPPING_THRESHOLD_CENTS ? 0 : SHIPPING_FEE_CENTS;
 
-      const qty = Number(item.quantity || item.qty || 1);
-
-      return {
-        price_data: {
-          currency: "sgd",
-          product_data: {
-            name: item.name + (hasValidDiscount ? " (Discounted)" : ""),
-            description: item.personalise ? `Personalisation: ${item.personalise}` : undefined,
-          },
-          unit_amount: finalPrice,
-        },
-        quantity: qty,
-      };
-    });
+    const chargeCents = finalTotalCents + shippingFeeCents;
+    // HitPay amount 用「元」为单位，例如 12.80
+    const amountDollars = (chargeCents / 100).toFixed(2);
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
 
-    // 3.5 运费 — 用折扣后的商品小计来判断是否达到免运费门槛，
-    //     未达门槛就加一条"Shipping"的line item，金额是服务器自己算的，
-    //     不是前端传来的数字，避免被篡改。
-    const shippingFeeCents = finalTotalCents >= FREE_SHIPPING_THRESHOLD_CENTS ? 0 : SHIPPING_FEE_CENTS;
-    if (shippingFeeCents > 0) {
-      line_items.push({
-        price_data: {
-          currency: "sgd",
-          product_data: { name: "Shipping" },
-          unit_amount: shippingFeeCents,
-        },
-        quantity: 1,
-      });
-    }
+    // 订单说明（会显示在 HitPay 后台 / 付款页）
+    const purposeParts = cart.map((item) => {
+      const qty = Number(item.quantity || item.qty || 1);
+      const name = item.name || "Item";
+      const personalise = item.personalise ? ` [${item.personalise}]` : "";
+      return qty > 1 ? `${name} x${qty}${personalise}` : `${name}${personalise}`;
+    });
+    if (shippingFeeCents > 0) purposeParts.push("Shipping");
+    if (hasValidDiscount) purposeParts.push(`Discount: ${discountCode}`);
+    const purpose = purposeParts.join(" | ").slice(0, 200);
 
-    // 4. 发起 Stripe 结算 Session
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items,
-      success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/index.html`,
-      shipping_address_collection: { allowed_countries: ["SG"] },
+    const referenceNumber = `JW-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+
+    // 4. 调用 HitPay 创建 Payment Request
+    const baseUrl = getHitPayBaseUrl(apiKey);
+    const body = {
+      amount: amountDollars,
+      currency: "SGD",
+      purpose,
+      reference_number: referenceNumber,
+      redirect_url: `${origin}/success.html`,
+      // 常用新加坡付款方式；不传则使用商户后台默认开启的方式
+      payment_methods: ["paynow_online", "card"],
+      // 可选：付款成功后 HitPay 会 POST 到这个地址（之后可加 webhook 处理）
+      // webhook: `${origin}/api/hitpay-webhook`,
+    };
+
+    const hitpayRes = await fetch(`${baseUrl}/v1/payment-requests`, {
+      method: "POST",
+      headers: {
+        "X-BUSINESS-API-KEY": apiKey,
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify(body),
     });
 
-    // 5. 立刻把这个折扣码标记为已使用 — 从这一刻起，任何人再用同一个码
-    //    (包括原本那个人自己)都会被 validate-discount 判定为"已使用过"。
-    if (hasValidDiscount && discountKey) {
-      await kv.set(discountKey, {
-        ...discountRecord,
-        used: true,
-        usedAt: Date.now(),
-        stripeSessionId: session.id,
-      });
+    const data = await hitpayRes.json().catch(() => ({}));
+
+    if (!hitpayRes.ok) {
+      console.error("HitPay error:", hitpayRes.status, data);
+      const msg =
+        data.message ||
+        data.error ||
+        (typeof data === "string" ? data : null) ||
+        `HitPay request failed (${hitpayRes.status})`;
+      return res.status(502).json({ error: msg });
     }
 
-    return res.status(200).json({ url: session.url });
+    if (!data.url) {
+      console.error("HitPay response missing url:", data);
+      return res.status(502).json({ error: "HitPay did not return a checkout URL" });
+    }
+
+    // 5. 标记折扣码已使用（与原来 Stripe 逻辑一致）
+    if (hasValidDiscount && discountKey) {
+      try {
+        await kv.set(discountKey, {
+          ...discountRecord,
+          used: true,
+          usedAt: Date.now(),
+          hitpayPaymentRequestId: data.id,
+          referenceNumber,
+        });
+      } catch (e) {
+        console.warn("Failed to mark discount used:", e.message);
+      }
+    }
+
+    return res.status(200).json({
+      url: data.url,
+      paymentRequestId: data.id,
+      referenceNumber,
+    });
   } catch (err) {
-    console.error("Stripe Error:", err.message);
-    return res.status(500).json({ error: err.message });
+    console.error("Checkout error:", err);
+    return res.status(500).json({ error: err.message || "Checkout failed" });
   }
 };
