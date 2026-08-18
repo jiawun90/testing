@@ -18,10 +18,15 @@ const PRODUCTS = [
     desc: "Includes a personalised 3D-printed name tag, plus your choice of ANY 2 3D-printed keepsakes: Flickering Light, Dinosaur Egg (with a baby dino inside), Milk Box Holder, or Desk Organizer.",
     priceCents: 1280, // S$12.80
     priceLabel: "S$12.80",
-    // 这个商品用"选项栏"而不是自由输入文字，客人下单更方便，也不会漏填
-    nameField: { label: "Name for the name tag", placeholder: "Alicia" },
+    // 支援一次输入多个名字（一行一个），适合班级派对一次订多个 name tag
+    multiName: true,
+    nameField: {
+      label: "Names for the name tags",
+      placeholder: "Alicia\nMarcus\nZoe\n...(one name per line)",
+      helper: "Enter one name per line. Each name gets its own 3D-printed name tag."
+    },
     chooseOptions: {
-      label: "Choose any 2 keepsakes",
+      label: "Choose any 2 keepsakes (same for all)",
       max: 2,
       choices: [
         "Flickering Light",
@@ -170,16 +175,20 @@ function renderProducts() {
         <p class="product-price">${p.priceLabel}</p>
 
         ${p.chooseOptions ? `
-          <!-- 名字栏 -->
+          <!-- 名字栏（支援多行 / 单行） -->
           <div class="field-row">
             <label for="personalise-${p.id}">${p.nameField.label}</label>
-            <input id="personalise-${p.id}" type="text" placeholder="${p.nameField.placeholder}">
+            ${p.multiName
+              ? `<textarea id="personalise-${p.id}" rows="4" placeholder="${p.nameField.placeholder}" class="name-textarea"></textarea>
+                 <p class="field-helper">${p.nameField.helper || "One name per line."}</p>`
+              : `<input id="personalise-${p.id}" type="text" placeholder="${p.nameField.placeholder}">`
+            }
           </div>
           <!-- 4选2 勾选栏 -->
           <div class="field-row choose-options" data-choose-group="${p.id}" data-max="${p.chooseOptions.max}">
             <label>${p.chooseOptions.label} <span class="choose-count" id="chooseCount-${p.id}">(0/${p.chooseOptions.max})</span></label>
             <div class="choose-options-list">
-              ${p.chooseOptions.choices.map((choice, i) => `
+              ${p.chooseOptions.choices.map((choice) => `
                 <label class="choose-option">
                   <input type="checkbox" class="choose-checkbox" data-choose-group="${p.id}" value="${choice}">
                   <span>${choice}</span>
@@ -195,12 +204,13 @@ function renderProducts() {
           </div>
         `}
 
-        <!-- 数量选择框 + 按钮（同一行） -->
+        <!-- 数量选择框 + 按钮（多名字商品不显示数量，因为名字数量决定件数） -->
         <div style="display: flex; gap: 0.5em; align-items: center; margin-top: 1em;">
+          ${p.multiName ? "" : `
           <div style="display: flex; align-items: center; gap: 0.3em;">
             <label for="qty-${p.id}" style="margin: 0; font-size: 0.9em;">Qty:</label>
             <input id="qty-${p.id}" type="number" min="1" value="1" style="width: 50px; text-align: center; padding: 0.4em;">
-          </div>
+          </div>`}
           <button class="add-btn" data-add="${p.id}" style="flex: 1; margin: 0;">Add to cart</button>
         </div>
       </div>
@@ -240,29 +250,51 @@ function renderProducts() {
         const qtyInput = document.getElementById(`qty-${product.id}`);
         const qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : 1;
 
-        let personaliseText;
         if (product.chooseOptions) {
-          const name = input ? input.value.trim() : "";
           const checkedBoxes = container.querySelectorAll(
             `.choose-checkbox[data-choose-group="${product.id}"]:checked`
           );
           const selections = Array.from(checkedBoxes).map((b) => b.value);
 
-          if (!name) {
-            alert(`Please enter a ${product.nameField.label.toLowerCase()}.`);
-            return;
-          }
           if (selections.length !== product.chooseOptions.max) {
             alert(`Please choose exactly ${product.chooseOptions.max} keepsakes (you picked ${selections.length}).`);
             return;
           }
-          personaliseText = `${name} — ${selections.join(", ")}`;
+
+          // 多名字模式：一行一个名字，每个名字单独加入购物车
+          if (product.multiName) {
+            const raw = input ? input.value : "";
+            const names = raw
+              .split(/\r?\n/)
+              .map((n) => n.trim())
+              .filter((n) => n.length > 0);
+
+            if (names.length === 0) {
+              alert("Please enter at least one name (one name per line).");
+              return;
+            }
+
+            names.forEach((name) => {
+              const personaliseText = `${name} — ${selections.join(", ")}`;
+              addToCart(product, personaliseText, 1);
+            });
+          } else {
+            // 单名字模式
+            const name = input ? input.value.trim() : "";
+            if (!name) {
+              alert(`Please enter a ${product.nameField.label.toLowerCase()}.`);
+              return;
+            }
+            const personaliseText = `${name} — ${selections.join(", ")}`;
+            addToCart(product, personaliseText, qty);
+          }
         } else {
-          personaliseText = input ? input.value.trim() : "";
+          // 普通个性化商品（wish card 等）
+          const personaliseText = input ? input.value.trim() : "";
+          addToCart(product, personaliseText, qty);
         }
 
-        addToCart(product, personaliseText, qty);
-
+        // 清空表单
         if (input) input.value = "";
         if (qtyInput) qtyInput.value = "1";
         if (product.chooseOptions) {

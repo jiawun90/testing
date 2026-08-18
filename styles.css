@@ -199,10 +199,24 @@ em { font-style: italic; color: var(--gold); }
 
 .field-row { display: flex; flex-direction: column; gap: .3em; margin-top: auto; padding-top: 0.8em; }
 .field-row label { font-size: .78rem; color: var(--olive-soft); font-weight: 600; }
-.field-row input {
+.field-row input,
+.field-row textarea {
   padding: .55em .8em; border-radius: 8px;
   border: 1.5px solid rgba(183,150,95,.35);
-  font-family: 'Inter'; font-size: .9rem;
+  font-family: 'Inter', sans-serif; font-size: .9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.field-row textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.45;
+}
+.field-helper {
+  font-size: .75rem;
+  color: var(--olive-soft);
+  margin: 0.15em 0 0;
+  line-height: 1.4;
 }
 
 /* ==================== 4选2 Choose-Options 样式 ==================== */
