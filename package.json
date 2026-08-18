@@ -2,9 +2,8 @@
   "name": "jw-just-wishes-store",
   "version": "1.0.0",
   "private": true,
-  "description": "JW Just Wishes storefront — static site + Stripe Checkout serverless function",
+  "description": "JW Just Wishes storefront — static site + HitPay Checkout serverless function",
   "dependencies": {
-    "stripe": "^16.0.0",
     "@upstash/redis": "^1.34.0"
   }
 }
