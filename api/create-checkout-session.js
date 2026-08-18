@@ -130,10 +130,9 @@ module.exports = async (req, res) => {
       purpose,
       reference_number: referenceNumber,
       redirect_url: `${origin}/success.html`,
-      // 常用新加坡付款方式；不传则使用商户后台默认开启的方式
-      payment_methods: ["paynow_online", "card"],
-      // 可选：付款成功后 HitPay 会 POST 到这个地址（之后可加 webhook 处理）
-      // webhook: `${origin}/api/hitpay-webhook`,
+      // 不强制指定 payment_methods，使用 HitPay 后台已开启的付款方式
+      // 若之后要指定，先在 Dashboard → Settings → Payment Methods 开启，例如:
+      // payment_methods: ["paynow_online"]
     };
 
     const hitpayRes = await fetch(`${baseUrl}/v1/payment-requests`, {
