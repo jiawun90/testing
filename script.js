@@ -179,8 +179,11 @@ function renderProducts() {
           <div class="field-row">
             <label for="personalise-${p.id}">${p.nameField.label}</label>
             ${p.multiName
-              ? `<textarea id="personalise-${p.id}" rows="4" placeholder="${p.nameField.placeholder}" class="name-textarea"></textarea>
-                 <p class="field-helper">${p.nameField.helper || "One name per line."}</p>`
+              ? `<textarea id="personalise-${p.id}" rows="4" placeholder="${p.nameField.placeholder}" class="name-textarea" data-product-id="${p.id}"></textarea>
+                 <div class="name-meta">
+                   <span class="name-count" id="nameCount-${p.id}">0 names</span>
+                   <span class="field-helper">${p.nameField.helper || "One name per line."}</span>
+                 </div>`
               : `<input id="personalise-${p.id}" type="text" placeholder="${p.nameField.placeholder}">`
             }
           </div>
@@ -211,7 +214,7 @@ function renderProducts() {
             <label for="qty-${p.id}" style="margin: 0; font-size: 0.9em;">Qty:</label>
             <input id="qty-${p.id}" type="number" min="1" value="1" style="width: 50px; text-align: center; padding: 0.4em;">
           </div>`}
-          <button class="add-btn" data-add="${p.id}" style="flex: 1; margin: 0;">Add to cart</button>
+          <button class="add-btn" data-add="${p.id}" id="addBtn-${p.id}" style="flex: 1; margin: 0;">Add to cart</button>
         </div>
       </div>
     </div>
@@ -237,9 +240,37 @@ function renderProducts() {
     });
   };
 
+  // Helper: 多名字商品 — 实时显示已输入名字数量 + 更新按钮文字
+  const bindNameCount = (container) => {
+    container.querySelectorAll(".name-textarea").forEach((textarea) => {
+      const productId = textarea.dataset.productId;
+      const countEl = document.getElementById(`nameCount-${productId}`);
+      const addBtn = document.getElementById(`addBtn-${productId}`);
+
+      const updateCount = () => {
+        const names = textarea.value
+          .split(/\r?\n/)
+          .map((n) => n.trim())
+          .filter((n) => n.length > 0);
+        const n = names.length;
+        if (countEl) {
+          countEl.textContent = n === 0 ? "0 names" : n === 1 ? "1 name" : `${n} names`;
+          countEl.classList.toggle("has-names", n > 0);
+        }
+        if (addBtn) {
+          addBtn.textContent = n === 0 ? "Add to cart" : n === 1 ? "Add 1 name tag" : `Add ${n} name tags`;
+        }
+      };
+
+      textarea.addEventListener("input", updateCount);
+      updateCount(); // 初始状态
+    });
+  };
+
   // Helper function to attach event listeners to buttons
   const bindEvents = (container) => {
     bindChooseOptions(container);
+    bindNameCount(container);
 
     container.querySelectorAll("[data-add]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -261,7 +292,7 @@ function renderProducts() {
             return;
           }
 
-          // 多名字模式：一行一个名字，每个名字单独加入购物车
+          // 多名字模式：一次加入，数量 = 名字数量，购物车只显示一条
           if (product.multiName) {
             const raw = input ? input.value : "";
             const names = raw
@@ -274,10 +305,9 @@ function renderProducts() {
               return;
             }
 
-            names.forEach((name) => {
-              const personaliseText = `${name} — ${selections.join(", ")}`;
-              addToCart(product, personaliseText, 1);
-            });
+            // 把所有名字整理成清晰的一串，方便你后台看到
+            const personaliseText = `${names.length} names: ${names.join(", ")} — ${selections.join(", ")}`;
+            addToCart(product, personaliseText, names.length);
           } else {
             // 单名字模式
             const name = input ? input.value.trim() : "";
@@ -294,7 +324,7 @@ function renderProducts() {
           addToCart(product, personaliseText, qty);
         }
 
-        // 清空表单
+        // 清空表单 + 重置计数和按钮文字
         if (input) input.value = "";
         if (qtyInput) qtyInput.value = "1";
         if (product.chooseOptions) {
@@ -305,6 +335,14 @@ function renderProducts() {
           const countEl = document.getElementById(`chooseCount-${product.id}`);
           if (countEl) countEl.textContent = `(0/${product.chooseOptions.max})`;
         }
+        // 重置多名字计数和按钮
+        const nameCountEl = document.getElementById(`nameCount-${product.id}`);
+        if (nameCountEl) {
+          nameCountEl.textContent = "0 names";
+          nameCountEl.classList.remove("has-names");
+        }
+        const addBtn = document.getElementById(`addBtn-${product.id}`);
+        if (addBtn) addBtn.textContent = "Add to cart";
       });
     });
   };
@@ -341,23 +379,39 @@ function renderCart() {
     if (cart.length === 0) {
       itemsEl.innerHTML = "<p style='padding: 1em 0; color: #888;'>Your cart is empty.</p>";
     } else {
-      itemsEl.innerHTML = cart.map((item) => `
-        <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.8em 0; border-bottom: 1px solid #eee;">
-          <div style="flex: 1;">
-            <strong style="display: block;">${item.name}</strong>
-            ${item.personalise ? `<small style="color: #666;">For: ${item.personalise}</small><br>` : ''}
-            <span style="font-weight: bold; color: var(--olive);">${item.priceLabel}</span>
-          </div>
+      itemsEl.innerHTML = cart.map((item) => {
+        // 把 "10 names: A, B, C — keepsakes" 拆成更易读的显示
+        let personaliseHtml = "";
+        if (item.personalise) {
+          const multiMatch = item.personalise.match(/^(\d+)\s+names:\s*(.+?)\s*—\s*(.+)$/i);
+          if (multiMatch) {
+            const [, count, namesList, keepsakes] = multiMatch;
+            personaliseHtml = `
+              <small class="cart-personalise">
+                <span class="cart-names-label">${count} name tags:</span>
+                <span class="cart-names-list">${namesList}</span>
+                <span class="cart-keepsakes">Keepsakes: ${keepsakes}</span>
+              </small>`;
+          } else {
+            personaliseHtml = `<small class="cart-personalise">For: ${item.personalise}</small>`;
+          }
+        }
 
-          <!-- 修改数量按钮 (+ / -) -->
-          <div style="display: flex; align-items: center; gap: 0.4em;">
-            <button onclick="updateCartQty('${item.lineId}', -1)" style="padding: 2px 8px; cursor: pointer;">-</button>
-            <span style="font-weight: bold; min-width: 20px; text-align: center;">${item.quantity || 1}</span>
-            <button onclick="updateCartQty('${item.lineId}', 1)" style="padding: 2px 8px; cursor: pointer;">+</button>
-            <button onclick="removeFromCart('${item.lineId}')" style="background: none; border: none; color: #cc0000; cursor: pointer; margin-left: 0.5em;">✕</button>
+        return `
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <strong class="cart-item-name">${item.name}</strong>
+            ${personaliseHtml}
+            <span class="cart-item-price">${item.priceLabel} each</span>
           </div>
-        </div>
-      `).join("");
+          <div class="cart-item-controls">
+            <button class="qty-btn" onclick="updateCartQty('${item.lineId}', -1)">−</button>
+            <span class="qty-num">${item.quantity || 1}</span>
+            <button class="qty-btn" onclick="updateCartQty('${item.lineId}', 1)">+</button>
+            <button class="remove-btn" onclick="removeFromCart('${item.lineId}')" title="Remove">✕</button>
+          </div>
+        </div>`;
+      }).join("");
     }
   }
 
