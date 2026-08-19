@@ -41,8 +41,8 @@ const PACK_THEMES = [
     label: "Space",
     image: "images/theme-astro.webp",
     overlay: {
-      name: { top: "18%", left: "50%", fontSize: "0.95rem" },
-      age:  { top: "48%", left: "50%", fontSize: "2.4rem" },
+      name: { top: "18%", left: "50%", fontSize: "23px" },
+      age:  { top: "58%", left: "50%", fontSize: "2.4rem" },
     },
   },
   {
@@ -50,7 +50,7 @@ const PACK_THEMES = [
     label: "Dino",
     image: "images/theme-dino.webp",
     overlay: {
-      name: { top: "22%", left: "50%", fontSize: "0.9rem" },
+      name: { top: "22%", left: "50%", fontSize: "23px" },
       age:  { top: "42%", left: "72%", fontSize: "2.2rem" },
     },
   },
@@ -59,7 +59,7 @@ const PACK_THEMES = [
     label: "Mermaid",
     image: "images/theme-mermaid.webp",
     overlay: {
-      name: { top: "58%", left: "32%", fontSize: "0.95rem" },
+      name: { top: "58%", left: "32%", fontSize: "23px" },
       age:  { top: "72%", left: "32%", fontSize: "1.5rem" },
     },
   },
@@ -68,7 +68,7 @@ const PACK_THEMES = [
     label: "Safari",
     image: "images/theme-safari.webp",
     overlay: {
-      name: { top: "48%", left: "50%", fontSize: "0.9rem" },
+      name: { top: "48%", left: "50%", fontSize: "23px" },
       age:  { top: "60%", left: "58%", fontSize: "1.6rem" },
     },
   },
@@ -77,7 +77,7 @@ const PACK_THEMES = [
     label: "Unicorn",
     image: "images/theme-unicorn.webp",
     overlay: {
-      name: { top: "42%", left: "50%", fontSize: "1rem" },
+      name: { top: "42%", left: "50%", fontSize: "23px" },
       age:  { top: "58%", left: "50%", fontSize: "2rem" },
     },
   },

@@ -1207,6 +1207,9 @@ a.product-card-link:hover {
   pointer-events: none;
   z-index: 2;
 }
+.theme-preview-frame .preview-name {
+  font-size: 23px; /* ~23pt，预览卡上的名字 */
+}
 .theme-preview-frame .preview-name.is-placeholder,
 .theme-preview-frame .preview-age.is-placeholder {
   opacity: 0.5;
@@ -1382,16 +1385,16 @@ a.product-card-link:hover {
   border-color: var(--gold);
 }
 
-/* 岁数插图：限制在卡片内、居中（位置仍可由 JS 微调） */
+/* 岁数插图：略小 2%、略靠下 */
 .theme-preview-frame .preview-age-img {
   position: absolute;
-  top: 52%;
+  top: 58%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: auto;
   height: auto;
-  max-width: 42%;
-  max-height: 32%;
+  max-width: 40%;
+  max-height: 30%;
   object-fit: contain;
   pointer-events: none;
   z-index: 2;
