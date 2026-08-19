@@ -214,7 +214,7 @@ function renderProducts() {
         </div>
 
         <button type="button" class="btn-customise" data-open-customise="${p.id}" id="openCustomise-${p.id}">
-          Customise &amp; Add
+          Customise
         </button>
       </div>
     </div>`;
