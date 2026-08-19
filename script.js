@@ -1,11 +1,11 @@
 // ============================================================
 // JW Just Wishes — storefront logic
 // Cart state, product rendering, live personalisation demo,
-// and handing off to Stripe Checkout via /api/create-checkout-session
+// and handing off to HitPay Checkout via /api/create-checkout-session
 // =============================================================
 
 // 运费规则：未满这个金额（分）收取固定运费；达到或超过则免运费。
-// 这两个数字会同时用在①购物车画面显示 ②Stripe结账时真正收取的金额，
+// 这两个数字会同时用在①购物车画面显示 ②HitPay结账时真正收取的金额，
 // 改这里的数字，购物车提示文字和实际收费会一起更新，不用改两个地方。
 const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // S$100.00 — 未满这个金额收运费
 const SHIPPING_FEE_CENTS = 500; // S$5.00 — 未满门槛时收取的固定运费
@@ -166,16 +166,19 @@ function renderProducts() {
   const shopGrid = document.getElementById("productGrid");  // Shop page container
 
   // Helper function to build the HTML string
-  const createMarkup = (items) => items.map((p) => `
+  const createMarkup = (items) => items.map((p) => {
+    // Signature 3D Wonder Box 等：默认折叠，点「Customise」才展开介绍 + 名字 + 4选2
+    if (p.chooseOptions) {
+      return `
     <div class="product-card" data-id="${p.id}">
       <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ''}</div>
       <div class="product-body">
         <h3>${p.name}${p.ageLabel ? ` <span class="age-label">${p.ageLabel}</span>` : ""}</h3>
-        <p class="product-desc">${p.desc}</p>
         <p class="product-price">${p.priceLabel}</p>
 
-        ${p.chooseOptions ? `
-          <!-- 名字栏（支援多行 / 单行） -->
+        <!-- 默认隐藏的自定义区域 -->
+        <div class="customise-panel" id="customisePanel-${p.id}" hidden>
+          <p class="product-desc">${p.desc}</p>
           <div class="field-row">
             <label for="personalise-${p.id}">${p.nameField.label}</label>
             ${p.multiName
@@ -187,7 +190,6 @@ function renderProducts() {
               : `<input id="personalise-${p.id}" type="text" placeholder="${p.nameField.placeholder}">`
             }
           </div>
-          <!-- 4选2 勾选栏 -->
           <div class="field-row choose-options" data-choose-group="${p.id}" data-max="${p.chooseOptions.max}">
             <label>${p.chooseOptions.label} <span class="choose-count" id="chooseCount-${p.id}">(0/${p.chooseOptions.max})</span></label>
             <div class="choose-options-list">
@@ -199,26 +201,42 @@ function renderProducts() {
               `).join("")}
             </div>
           </div>
-        ` : `
-          <!-- 个性化文字输入框 -->
-          <div class="field-row">
-            <label for="personalise-${p.id}">${p.personalise.label}</label>
-            <input id="personalise-${p.id}" type="text" placeholder="${p.personalise.placeholder}">
+          <div class="customise-actions">
+            <button type="button" class="add-btn" data-add="${p.id}" id="addBtn-${p.id}">Add to cart</button>
+            <button type="button" class="cancel-customise" data-cancel-customise="${p.id}">Cancel</button>
           </div>
-        `}
+        </div>
 
-        <!-- 数量选择框 + 按钮（多名字商品不显示数量，因为名字数量决定件数） -->
+        <!-- 默认显示的按钮：点开后隐藏 -->
+        <button type="button" class="btn-customise" data-open-customise="${p.id}" id="openCustomise-${p.id}">
+          Customise &amp; Add
+        </button>
+      </div>
+    </div>`;
+    }
+
+    // 普通商品（有 wish card 名字）
+    return `
+    <div class="product-card" data-id="${p.id}">
+      <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ''}</div>
+      <div class="product-body">
+        <h3>${p.name}${p.ageLabel ? ` <span class="age-label">${p.ageLabel}</span>` : ""}</h3>
+        <p class="product-desc">${p.desc}</p>
+        <p class="product-price">${p.priceLabel}</p>
+        <div class="field-row">
+          <label for="personalise-${p.id}">${p.personalise.label}</label>
+          <input id="personalise-${p.id}" type="text" placeholder="${p.personalise.placeholder}">
+        </div>
         <div style="display: flex; gap: 0.5em; align-items: center; margin-top: 1em;">
-          ${p.multiName ? "" : `
           <div style="display: flex; align-items: center; gap: 0.3em;">
             <label for="qty-${p.id}" style="margin: 0; font-size: 0.9em;">Qty:</label>
             <input id="qty-${p.id}" type="number" min="1" value="1" style="width: 50px; text-align: center; padding: 0.4em;">
-          </div>`}
+          </div>
           <button class="add-btn" data-add="${p.id}" id="addBtn-${p.id}" style="flex: 1; margin: 0;">Add to cart</button>
         </div>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
 
   // Helper: 4选2 勾选栏 — 选满上限后，其余未勾选的选项自动disable，
   // 避免客人不小心选超过限制
@@ -267,10 +285,54 @@ function renderProducts() {
     });
   };
 
+  // Helper: 折叠/展开自定义面板（Signature 3D Wonder Box）
+  const bindCustomisePanels = (container) => {
+    container.querySelectorAll("[data-open-customise]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.openCustomise;
+        const panel = document.getElementById(`customisePanel-${id}`);
+        if (panel) {
+          panel.hidden = false;
+          btn.hidden = true;
+          // 展开后滚动到表单，方便手机端操作
+          panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-cancel-customise]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.cancelCustomise;
+        const panel = document.getElementById(`customisePanel-${id}`);
+        const openBtn = document.getElementById(`openCustomise-${id}`);
+        if (panel) panel.hidden = true;
+        if (openBtn) openBtn.hidden = false;
+
+        // 清空已填内容
+        const input = document.getElementById(`personalise-${id}`);
+        if (input) input.value = "";
+        container.querySelectorAll(`.choose-checkbox[data-choose-group="${id}"]`).forEach((b) => {
+          b.checked = false;
+          b.disabled = false;
+        });
+        const countEl = document.getElementById(`chooseCount-${id}`);
+        if (countEl) countEl.textContent = `(0/2)`;
+        const nameCountEl = document.getElementById(`nameCount-${id}`);
+        if (nameCountEl) {
+          nameCountEl.textContent = "0 names";
+          nameCountEl.classList.remove("has-names");
+        }
+        const addBtn = document.getElementById(`addBtn-${id}`);
+        if (addBtn) addBtn.textContent = "Add to cart";
+      });
+    });
+  };
+
   // Helper function to attach event listeners to buttons
   const bindEvents = (container) => {
     bindChooseOptions(container);
     bindNameCount(container);
+    bindCustomisePanels(container);
 
     container.querySelectorAll("[data-add]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -341,8 +403,16 @@ function renderProducts() {
           nameCountEl.textContent = "0 names";
           nameCountEl.classList.remove("has-names");
         }
-        const addBtn = document.getElementById(`addBtn-${product.id}`);
-        if (addBtn) addBtn.textContent = "Add to cart";
+        const addBtnEl = document.getElementById(`addBtn-${product.id}`);
+        if (addBtnEl) addBtnEl.textContent = "Add to cart";
+
+        // 加购成功后收起自定义面板
+        if (product.chooseOptions) {
+          const panel = document.getElementById(`customisePanel-${product.id}`);
+          const openBtn = document.getElementById(`openCustomise-${product.id}`);
+          if (panel) panel.hidden = true;
+          if (openBtn) openBtn.hidden = false;
+        }
       });
     });
   };
