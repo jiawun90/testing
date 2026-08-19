@@ -1344,3 +1344,39 @@ a.product-card-link:hover {
 .bag-preview-age.is-placeholder {
   opacity: 0.45;
 }
+
+/* ==================== Name font picker ==================== */
+.font-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-top: 0.35em;
+}
+.font-option {
+  cursor: pointer;
+  margin: 0;
+}
+.font-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.font-swatch {
+  display: inline-block;
+  padding: 0.5em 0.9em;
+  border-radius: 10px;
+  border: 1.5px solid rgba(183,150,95,.35);
+  background: var(--cream, #F6F1E7);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  transition: border-color .15s, background .15s;
+}
+.font-option input:checked + .font-swatch {
+  border-color: var(--olive);
+  background: rgba(63, 74, 50, 0.12);
+  color: var(--olive);
+}
+.font-option:hover .font-swatch {
+  border-color: var(--gold);
+}

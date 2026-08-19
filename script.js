@@ -10,6 +10,13 @@
 const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // S$100.00 — 未满这个金额收运费
 const SHIPPING_FEE_CENTS = 500; // S$5.00 — 未满门槛时收取的固定运费
 
+// 名字卡字体选项（预览 + 下单备注）
+const NAME_FONTS = [
+  { id: "fraunces", label: "Elegant", family: "'Fraunces', serif" },
+  { id: "fredoka", label: "Playful", family: "'Fredoka', sans-serif" },
+  { id: "pacifico", label: "Script", family: "'Pacifico', cursive" },
+];
+
 // 礼包主题（对应名字卡设计图）
 // overlay: 每张卡名字/岁数位置不同（百分比 + 字号）
 const PACK_THEMES = [
@@ -369,6 +376,18 @@ function renderProductPage() {
             <p class="field-helper">Used on the age card / print materials.</p>
           </div>
 
+          ${product.hasThemePreview ? `
+          <div class="field-row">
+            <label>Name font</label>
+            <div class="font-options" id="fontOptions">
+              ${NAME_FONTS.map((f, i) => `
+                <label class="font-option">
+                  <input type="radio" name="name-font" value="${f.id}" data-font-family="${f.family}" ${i === 0 ? "checked" : ""}>
+                  <span class="font-swatch" style="font-family: ${f.family}">${f.label}</span>
+                </label>`).join("")}
+            </div>
+          </div>` : ""}
+
           ${previewHtml}
           ${bagPreviewHtml}
 
@@ -464,8 +483,21 @@ function renderProductPage() {
   detailEl.querySelectorAll('input[name="pack-theme"]').forEach((radio) => {
     radio.addEventListener("change", updateThemeImage);
   });
+
+  const applyFont = () => {
+    const selected = detailEl.querySelector('input[name="name-font"]:checked');
+    const family = selected?.dataset?.fontFamily || NAME_FONTS[0].family;
+    [previewName, previewAge, bagPreviewName, bagPreviewAge].forEach((el) => {
+      if (el) el.style.fontFamily = family;
+    });
+  };
+  detailEl.querySelectorAll('input[name="name-font"]').forEach((radio) => {
+    radio.addEventListener("change", applyFont);
+  });
+
   updatePreview();
   updateThemeImage();
+  applyFont();
 
   // 袋子正反面翻转
   const bagFlipCard = document.getElementById("bagFlipCard");
@@ -536,12 +568,16 @@ function renderProductPage() {
         }
       }
 
+      const fontId = detailEl.querySelector('input[name="name-font"]:checked')?.value || "";
+      const fontLabel = NAME_FONTS.find((f) => f.id === fontId)?.label || fontId;
+
       // 整理给商家看的个性化信息
       const parts = [
         `Theme: ${theme}`,
         `Child: ${childName}`,
         `Age: ${childAge}`,
       ];
+      if (fontLabel) parts.push(`Font: ${fontLabel}`);
       if (selections.length) parts.push(`Keepsakes: ${selections.join(", ")}`);
       if (tagNamesList.length) parts.push(`Name tags (${tagNamesList.length}): ${tagNamesList.join(", ")}`);
 
