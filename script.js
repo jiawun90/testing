@@ -76,11 +76,8 @@ const PRODUCTS = [
     // 主题卡预览（共用）+ 袋子正反面预览
     hasThemePreview: true,
     hasBagPreview: true,
-    // 图片准备好后改成真实路径，例如：
-    // bagFront: "images/bag-charm-front.webp",
-    // bagBack: "images/bag-charm-back.webp",
-    bagFront: null,
-    bagBack: null,
+    bagFront: "images/bag-charm-front.webp",
+    bagBack: "images/bag-charm-back.webp",
   },
 ];
 
