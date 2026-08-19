@@ -167,18 +167,24 @@ function renderProducts() {
 
   // Helper function to build the HTML string
   const createMarkup = (items) => items.map((p) => {
-    // Signature 3D Wonder Box 等：默认折叠，点「Customise」才展开介绍 + 名字 + 4选2
+    // Signature 3D Wonder Box：介绍默认显示一段 + Show more；名字/4选2 点 Customise 才展开
     if (p.chooseOptions) {
+      const shortDesc = p.desc.length > 90 ? p.desc.slice(0, 90).trim() + "…" : p.desc;
+      const needsMore = p.desc.length > 90;
       return `
     <div class="product-card" data-id="${p.id}">
       <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ''}</div>
       <div class="product-body">
         <h3>${p.name}${p.ageLabel ? ` <span class="age-label">${p.ageLabel}</span>` : ""}</h3>
+        <div class="desc-block">
+          <p class="product-desc desc-short" id="descShort-${p.id}">${shortDesc}</p>
+          <p class="product-desc desc-full" id="descFull-${p.id}" hidden>${p.desc}</p>
+          ${needsMore ? `<button type="button" class="btn-show-more" data-toggle-desc="${p.id}" id="toggleDesc-${p.id}">Show more</button>` : ""}
+        </div>
         <p class="product-price">${p.priceLabel}</p>
 
-        <!-- 默认隐藏的自定义区域 -->
+        <!-- 默认隐藏：名字 + 4选2 + 加购 -->
         <div class="customise-panel" id="customisePanel-${p.id}" hidden>
-          <p class="product-desc">${p.desc}</p>
           <div class="field-row">
             <label for="personalise-${p.id}">${p.nameField.label}</label>
             ${p.multiName
@@ -207,7 +213,6 @@ function renderProducts() {
           </div>
         </div>
 
-        <!-- 默认显示的按钮：点开后隐藏 -->
         <button type="button" class="btn-customise" data-open-customise="${p.id}" id="openCustomise-${p.id}">
           Customise &amp; Add
         </button>
@@ -285,8 +290,28 @@ function renderProducts() {
     });
   };
 
-  // Helper: 折叠/展开自定义面板（Signature 3D Wonder Box）
+  // Helper: 折叠/展开自定义面板 + 介绍 Show more
   const bindCustomisePanels = (container) => {
+    // Show more / Show less 介绍
+    container.querySelectorAll("[data-toggle-desc]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.toggleDesc;
+        const shortEl = document.getElementById(`descShort-${id}`);
+        const fullEl = document.getElementById(`descFull-${id}`);
+        if (!shortEl || !fullEl) return;
+        const expanded = !fullEl.hidden;
+        if (expanded) {
+          fullEl.hidden = true;
+          shortEl.hidden = false;
+          btn.textContent = "Show more";
+        } else {
+          shortEl.hidden = true;
+          fullEl.hidden = false;
+          btn.textContent = "Show less";
+        }
+      });
+    });
+
     container.querySelectorAll("[data-open-customise]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.dataset.openCustomise;
@@ -294,7 +319,6 @@ function renderProducts() {
         if (panel) {
           panel.hidden = false;
           btn.hidden = true;
-          // 展开后滚动到表单，方便手机端操作
           panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       });
@@ -308,7 +332,6 @@ function renderProducts() {
         if (panel) panel.hidden = true;
         if (openBtn) openBtn.hidden = false;
 
-        // 清空已填内容
         const input = document.getElementById(`personalise-${id}`);
         if (input) input.value = "";
         container.querySelectorAll(`.choose-checkbox[data-choose-group="${id}"]`).forEach((b) => {

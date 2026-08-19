@@ -238,6 +238,29 @@ em { font-style: italic; color: var(--gold); }
   background: rgba(63, 74, 50, 0.12);
 }
 
+/* ==================== 介绍 Show more ==================== */
+.desc-block {
+  margin-bottom: 0.5em;
+}
+.desc-block .product-desc {
+  margin-bottom: 0.25em;
+}
+.btn-show-more {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.btn-show-more:hover {
+  color: var(--olive);
+}
+
 /* ==================== Customise 折叠面板（Signature 3D Wonder Box） ==================== */
 .btn-customise {
   display: block;
