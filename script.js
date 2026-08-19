@@ -17,6 +17,22 @@ const NAME_FONTS = [
   { id: "pacifico", label: "Script", family: "'Pacifico', cursive" },
 ];
 
+// 各主题的岁数插图（key = 主题 id）
+// Space: Space-01.png … Space-09.png；其它主题之后再补
+const AGE_IMAGES_BY_THEME = {
+  astro: {
+    "1": "images/Space-01.png",
+    "2": "images/Space-02.png",
+    "3": "images/Space-03.png",
+    "4": "images/Space-04.png",
+    "5": "images/Space-05.png",
+    "6": "images/Space-06.png",
+    "7": "images/Space-07.png",
+    "8": "images/Space-08.png",
+    "9": "images/Space-09.png",
+  },
+};
+
 // 礼包主题（对应名字卡设计图）
 // overlay: 每张卡名字/岁数位置不同（百分比 + 字号）
 const PACK_THEMES = [
@@ -306,6 +322,7 @@ function renderProductPage() {
         <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
         <p class="preview-name" id="previewName">Your name</p>
         <p class="preview-age" id="previewAge">—</p>
+        <img class="preview-age-img" id="previewAgeImg" alt="Age" hidden>
       </div>
       <p class="field-helper">Preview updates as you type. Final print may vary slightly.</p>
     </div>`
@@ -329,6 +346,7 @@ function renderProductPage() {
             <div class="bag-name-overlay">
               <p class="bag-preview-name" id="bagPreviewName">Your name</p>
               <p class="bag-preview-age" id="bagPreviewAge">Age —</p>
+              <img class="bag-preview-age-img" id="bagPreviewAgeImg" alt="Age" hidden>
             </div>
           </div>
           <div class="bag-face bag-face-back">
@@ -428,10 +446,35 @@ function renderProductPage() {
   const childAgeInput = document.getElementById("childAge");
   const previewName = document.getElementById("previewName");
   const previewAge = document.getElementById("previewAge");
+  const previewAgeImg = document.getElementById("previewAgeImg");
   const themePreviewImg = document.getElementById("themePreviewImg");
 
   const bagPreviewName = document.getElementById("bagPreviewName");
   const bagPreviewAge = document.getElementById("bagPreviewAge");
+  const bagPreviewAgeImg = document.getElementById("bagPreviewAgeImg");
+
+  const getSelectedThemeId = () =>
+    detailEl.querySelector('input[name="pack-theme"]:checked')?.dataset?.themeId || "";
+
+  const updateAgeDisplay = (textEl, imgEl, ageStr, withPrefix) => {
+    const key = (ageStr || "").trim();
+    const themeId = getSelectedThemeId();
+    const imgSrc = AGE_IMAGES_BY_THEME[themeId]?.[key];
+    if (imgSrc && imgEl) {
+      imgEl.src = imgSrc;
+      imgEl.hidden = false;
+      if (textEl) textEl.hidden = true;
+    } else {
+      if (imgEl) imgEl.hidden = true;
+      if (textEl) {
+        textEl.hidden = false;
+        textEl.textContent = key
+          ? (withPrefix ? (key.match(/^\d+$/) ? `Age ${key}` : key) : key)
+          : (withPrefix ? "Age —" : "—");
+        textEl.classList.toggle("is-placeholder", !key);
+      }
+    }
+  };
 
   const updatePreview = () => {
     const n = (childNameInput?.value || "").trim();
@@ -441,19 +484,13 @@ function renderProductPage() {
       previewName.textContent = n || "Your name";
       previewName.classList.toggle("is-placeholder", !n);
     }
-    if (previewAge) {
-      previewAge.textContent = a ? (a.match(/^\d+$/) ? `${a}` : a) : "—";
-      previewAge.classList.toggle("is-placeholder", !a);
-    }
+    updateAgeDisplay(previewAge, previewAgeImg, a, false);
     // 袋子正面预览（只有正面有名字/岁数）
     if (bagPreviewName) {
       bagPreviewName.textContent = n || "Your name";
       bagPreviewName.classList.toggle("is-placeholder", !n);
     }
-    if (bagPreviewAge) {
-      bagPreviewAge.textContent = a ? (a.match(/^\d+$/) ? `Age ${a}` : a) : "Age —";
-      bagPreviewAge.classList.toggle("is-placeholder", !a);
-    }
+    updateAgeDisplay(bagPreviewAge, bagPreviewAgeImg, a, true);
   };
 
   const applyOverlayPosition = (el, pos) => {
@@ -470,18 +507,22 @@ function renderProductPage() {
     const themeId = selected?.dataset?.themeId;
     if (themePreviewImg && imgSrc) themePreviewImg.src = imgSrc;
 
-    // 按主题切换名字/岁数位置
+    // 按主题切换名字/岁数位置（文字与插图共用）
     const theme = PACK_THEMES.find((t) => t.id === themeId) || PACK_THEMES[0];
     if (theme?.overlay) {
       applyOverlayPosition(previewName, theme.overlay.name);
       applyOverlayPosition(previewAge, theme.overlay.age);
+      applyOverlayPosition(previewAgeImg, theme.overlay.age);
     }
   };
 
   if (childNameInput) childNameInput.addEventListener("input", updatePreview);
   if (childAgeInput) childAgeInput.addEventListener("input", updatePreview);
   detailEl.querySelectorAll('input[name="pack-theme"]').forEach((radio) => {
-    radio.addEventListener("change", updateThemeImage);
+    radio.addEventListener("change", () => {
+      updateThemeImage();
+      updatePreview(); // 切换主题时刷新岁数图（Space 有图，其它暂用文字）
+    });
   });
 
   const applyFont = () => {
