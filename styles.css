@@ -1316,3 +1316,49 @@ a.product-card-link:hover {
   background: var(--olive);
   color: #fff;
 }
+
+/* 袋子正面：名字 + 岁数叠加 */
+.bag-face-front {
+  position: relative;
+}
+.bag-name-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3em 0.6em;
+  pointer-events: none;
+  text-align: center;
+  z-index: 2;
+}
+.bag-preview-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5), 0 0 2px rgba(0,0,0,.35);
+  margin: 0;
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 90%;
+}
+.bag-preview-name.is-placeholder {
+  opacity: 0.5;
+  font-style: italic;
+}
+.bag-preview-age {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+  margin: 0.2em 0 0;
+  line-height: 1;
+}
+.bag-preview-age.is-placeholder {
+  opacity: 0.45;
+}

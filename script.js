@@ -278,8 +278,12 @@ function renderProductPage() {
               : `<div class="bag-placeholder">
                    <span class="bag-ph-title">Bag — Front</span>
                    <span class="bag-ph-sub">Design placeholder</span>
-                   <span class="bag-ph-hint">Replace with bagFront image</span>
                  </div>`}
+            <!-- 只有正面叠名字 + 岁数 -->
+            <div class="bag-name-overlay">
+              <p class="bag-preview-name" id="bagPreviewName">Your name</p>
+              <p class="bag-preview-age" id="bagPreviewAge">Age —</p>
+            </div>
           </div>
           <div class="bag-face bag-face-back">
             ${product.bagBack
@@ -287,13 +291,12 @@ function renderProductPage() {
               : `<div class="bag-placeholder bag-placeholder-back">
                    <span class="bag-ph-title">Bag — Back</span>
                    <span class="bag-ph-sub">Design placeholder</span>
-                   <span class="bag-ph-hint">Replace with bagBack image</span>
                  </div>`}
           </div>
         </div>
       </div>
       <button type="button" class="btn-flip-bag" id="btnFlipBag">Flip to see back</button>
-      <p class="field-helper">Tap the button to flip between front and back of the bag.</p>
+      <p class="field-helper">Front shows name &amp; age. Flip to see the back design.</p>
     </div>`
     : "";
 
@@ -369,9 +372,13 @@ function renderProductPage() {
   const previewAge = document.getElementById("previewAge");
   const themePreviewImg = document.getElementById("themePreviewImg");
 
+  const bagPreviewName = document.getElementById("bagPreviewName");
+  const bagPreviewAge = document.getElementById("bagPreviewAge");
+
   const updatePreview = () => {
     const n = (childNameInput?.value || "").trim();
     const a = (childAgeInput?.value || "").trim();
+    // 主题卡预览
     if (previewName) {
       previewName.textContent = n || "Your name";
       previewName.classList.toggle("is-placeholder", !n);
@@ -379,6 +386,15 @@ function renderProductPage() {
     if (previewAge) {
       previewAge.textContent = a ? (a.match(/^\d+$/) ? `${a}` : a) : "—";
       previewAge.classList.toggle("is-placeholder", !a);
+    }
+    // 袋子正面预览（只有正面有名字/岁数）
+    if (bagPreviewName) {
+      bagPreviewName.textContent = n || "Your name";
+      bagPreviewName.classList.toggle("is-placeholder", !n);
+    }
+    if (bagPreviewAge) {
+      bagPreviewAge.textContent = a ? (a.match(/^\d+$/) ? `Age ${a}` : a) : "Age —";
+      bagPreviewAge.classList.toggle("is-placeholder", !a);
     }
   };
 
