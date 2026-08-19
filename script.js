@@ -11,12 +11,53 @@ const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // S$100.00 — 未满这个金额�
 const SHIPPING_FEE_CENTS = 500; // S$5.00 — 未满门槛时收取的固定运费
 
 // 礼包主题（对应名字卡设计图）
+// overlay: 每张卡名字/岁数位置不同（百分比 + 字号）
 const PACK_THEMES = [
-  { id: "astro", label: "Space", image: "images/theme-astro.webp" },
-  { id: "dino", label: "Dino", image: "images/theme-dino.webp" },
-  { id: "mermaid", label: "Mermaid", image: "images/theme-mermaid.webp" },
-  { id: "safari", label: "Safari", image: "images/theme-safari.webp" },
-  { id: "unicorn", label: "Unicorn", image: "images/theme-unicorn.webp" },
+  {
+    id: "astro",
+    label: "Space",
+    image: "images/theme-astro.webp",
+    overlay: {
+      name: { top: "18%", left: "50%", fontSize: "0.95rem" },
+      age:  { top: "48%", left: "50%", fontSize: "2.4rem" },
+    },
+  },
+  {
+    id: "dino",
+    label: "Dino",
+    image: "images/theme-dino.webp",
+    overlay: {
+      name: { top: "22%", left: "50%", fontSize: "0.9rem" },
+      age:  { top: "42%", left: "72%", fontSize: "2.2rem" },
+    },
+  },
+  {
+    id: "mermaid",
+    label: "Mermaid",
+    image: "images/theme-mermaid.webp",
+    overlay: {
+      name: { top: "58%", left: "32%", fontSize: "0.95rem" },
+      age:  { top: "72%", left: "32%", fontSize: "1.5rem" },
+    },
+  },
+  {
+    id: "safari",
+    label: "Safari",
+    image: "images/theme-safari.webp",
+    overlay: {
+      name: { top: "48%", left: "50%", fontSize: "0.9rem" },
+      age:  { top: "60%", left: "58%", fontSize: "1.6rem" },
+    },
+  },
+  {
+    id: "unicorn",
+    label: "Unicorn",
+    image: "images/theme-unicorn.webp",
+    overlay: {
+      name: { top: "42%", left: "50%", fontSize: "1rem" },
+      age:  { top: "58%", left: "50%", fontSize: "2rem" },
+    },
+  },
 ];
 
 const PRODUCTS = [
@@ -218,7 +259,7 @@ function renderProductPage() {
   // 主题选项：有预览图的商品显示缩略图，其它只显示文字
   const themesHtml = PACK_THEMES.map((t, i) => `
     <label class="theme-option ${product.hasThemePreview ? "theme-option-thumb" : ""}">
-      <input type="radio" name="pack-theme" value="${t.label}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
+      <input type="radio" name="pack-theme" value="${t.label}" data-theme-id="${t.id}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
       ${product.hasThemePreview && t.image
         ? `<span class="theme-thumb"><img src="${t.image}" alt="${t.label}"><span class="theme-thumb-label">${t.label}</span></span>`
         : `<span class="theme-card">${t.label}</span>`
@@ -256,10 +297,8 @@ function renderProductPage() {
       <p class="preview-label">Name card preview</p>
       <div class="theme-preview-frame">
         <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
-        <div class="theme-preview-overlay">
-          <p class="preview-name" id="previewName">Your name</p>
-          <p class="preview-age" id="previewAge">Age —</p>
-        </div>
+        <p class="preview-name" id="previewName">Your name</p>
+        <p class="preview-age" id="previewAge">—</p>
       </div>
       <p class="field-helper">Preview updates as you type. Final print may vary slightly.</p>
     </div>`
@@ -398,11 +437,26 @@ function renderProductPage() {
     }
   };
 
+  const applyOverlayPosition = (el, pos) => {
+    if (!el || !pos) return;
+    el.style.top = pos.top || "50%";
+    el.style.left = pos.left || "50%";
+    el.style.fontSize = pos.fontSize || "1rem";
+    el.style.transform = "translate(-50%, -50%)";
+  };
+
   const updateThemeImage = () => {
-    if (!themePreviewImg) return;
     const selected = detailEl.querySelector('input[name="pack-theme"]:checked');
     const imgSrc = selected?.dataset?.themeImage;
-    if (imgSrc) themePreviewImg.src = imgSrc;
+    const themeId = selected?.dataset?.themeId;
+    if (themePreviewImg && imgSrc) themePreviewImg.src = imgSrc;
+
+    // 按主题切换名字/岁数位置
+    const theme = PACK_THEMES.find((t) => t.id === themeId) || PACK_THEMES[0];
+    if (theme?.overlay) {
+      applyOverlayPosition(previewName, theme.overlay.name);
+      applyOverlayPosition(previewAge, theme.overlay.age);
+    }
   };
 
   if (childNameInput) childNameInput.addEventListener("input", updatePreview);
