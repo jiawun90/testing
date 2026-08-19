@@ -1229,3 +1229,90 @@ a.product-card-link:hover {
 .theme-preview-overlay .preview-age.is-placeholder {
   opacity: 0.45;
 }
+
+/* ==================== Gift bag flip preview (Charm Pack) ==================== */
+.bag-preview {
+  margin: 0.8em 0 1.2em;
+}
+.bag-flip-scene {
+  perspective: 1000px;
+  max-width: 240px;
+  margin: 0.4em 0 0.7em;
+}
+.bag-flip-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  transform-style: preserve-3d;
+  transition: transform 0.55s ease;
+}
+.bag-flip-card.is-flipped {
+  transform: rotateY(180deg);
+}
+.bag-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid rgba(183,150,95,.4);
+  box-shadow: 0 6px 18px rgba(44, 39, 29, 0.1);
+  background: #f5f0e6;
+}
+.bag-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.bag-face-back {
+  transform: rotateY(180deg);
+}
+.bag-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+  padding: 1em;
+  text-align: center;
+  background: linear-gradient(160deg, #f7f1e6 0%, #e8dcc8 100%);
+  color: var(--olive);
+}
+.bag-placeholder-back {
+  background: linear-gradient(160deg, #e8f0e8 0%, #d4e0d0 100%);
+}
+.bag-ph-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.bag-ph-sub {
+  font-size: .85rem;
+  opacity: 0.85;
+}
+.bag-ph-hint {
+  font-size: .7rem;
+  color: var(--olive-soft);
+  margin-top: 0.4em;
+}
+.btn-flip-bag {
+  display: inline-block;
+  padding: 0.45em 1em;
+  border-radius: 999px;
+  border: 1.5px solid var(--olive);
+  background: transparent;
+  color: var(--olive);
+  font-family: 'Inter', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn-flip-bag:hover {
+  background: var(--olive);
+  color: #fff;
+}

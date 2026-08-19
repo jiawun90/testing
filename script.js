@@ -62,17 +62,25 @@ const PRODUCTS = [
     priceCents: 680,
     priceLabel: "S$6.80",
     image: "images/product-routine-space.jpg",
-    // 此商品有真实主题图，商品页显示主题缩略图 + 名字/岁数实时预览
+    // 主题卡预览（与 Charm Pack 共用主题）
     hasThemePreview: true,
   },
   {
     id: "routine-charm-pack",
     name: "Magic Routine Charm Pack",
     ageLabel: "Ages 2+",
-    desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band.",
+    desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band. Includes a printed gift bag (front & back design).",
     priceCents: 880,
     priceLabel: "S$8.80",
     image: "images/product-routine-sunshine.jpg",
+    // 主题卡预览（共用）+ 袋子正反面预览
+    hasThemePreview: true,
+    hasBagPreview: true,
+    // 图片准备好后改成真实路径，例如：
+    // bagFront: "images/bag-charm-front.webp",
+    // bagBack: "images/bag-charm-back.webp",
+    bagFront: null,
+    bagBack: null,
   },
 ];
 
@@ -244,11 +252,11 @@ function renderProductPage() {
     </div>`
     : "";
 
-  // 仅 Magic Routine Spark Pack 显示真实主题图 + 名字/岁数叠加预览
+  // 主题卡实时预览（Spark + Charm 共用）
   const previewHtml = product.hasThemePreview
     ? `
     <div class="name-card-preview theme-image-preview" id="nameCardPreview" aria-live="polite">
-      <p class="preview-label">Live preview</p>
+      <p class="preview-label">Name card preview</p>
       <div class="theme-preview-frame">
         <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
         <div class="theme-preview-overlay">
@@ -257,6 +265,38 @@ function renderProductPage() {
         </div>
       </div>
       <p class="field-helper">Preview updates as you type. Final print may vary slightly.</p>
+    </div>`
+    : "";
+
+  // Charm Pack：袋子正反面翻转样板（图片可之后替换）
+  const bagPreviewHtml = product.hasBagPreview
+    ? `
+    <div class="bag-preview" id="bagPreview">
+      <p class="preview-label">Gift bag preview</p>
+      <div class="bag-flip-scene">
+        <div class="bag-flip-card" id="bagFlipCard">
+          <div class="bag-face bag-face-front">
+            ${product.bagFront
+              ? `<img src="${product.bagFront}" alt="Bag front">`
+              : `<div class="bag-placeholder">
+                   <span class="bag-ph-title">Bag — Front</span>
+                   <span class="bag-ph-sub">Design placeholder</span>
+                   <span class="bag-ph-hint">Replace with bagFront image</span>
+                 </div>`}
+          </div>
+          <div class="bag-face bag-face-back">
+            ${product.bagBack
+              ? `<img src="${product.bagBack}" alt="Bag back">`
+              : `<div class="bag-placeholder bag-placeholder-back">
+                   <span class="bag-ph-title">Bag — Back</span>
+                   <span class="bag-ph-sub">Design placeholder</span>
+                   <span class="bag-ph-hint">Replace with bagBack image</span>
+                 </div>`}
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-flip-bag" id="btnFlipBag">Flip to see back</button>
+      <p class="field-helper">Tap the button to flip between front and back of the bag.</p>
     </div>`
     : "";
 
@@ -291,6 +331,7 @@ function renderProductPage() {
           </div>
 
           ${previewHtml}
+          ${bagPreviewHtml}
 
           ${keepsakesHtml}
           ${multiNameHtml}
@@ -358,6 +399,18 @@ function renderProductPage() {
   });
   updatePreview();
   updateThemeImage();
+
+  // 袋子正反面翻转
+  const bagFlipCard = document.getElementById("bagFlipCard");
+  const btnFlipBag = document.getElementById("btnFlipBag");
+  if (bagFlipCard && btnFlipBag) {
+    let showingBack = false;
+    btnFlipBag.addEventListener("click", () => {
+      showingBack = !showingBack;
+      bagFlipCard.classList.toggle("is-flipped", showingBack);
+      btnFlipBag.textContent = showingBack ? "Flip to see front" : "Flip to see back";
+    });
+  }
 
   // 多名字计数
   const tagNames = document.getElementById("tagNames");
