@@ -271,10 +271,14 @@ function renderProductPage() {
           ${keepsakesHtml}
           ${multiNameHtml}
 
+          ${product.multiName ? `
+          <p class="field-helper qty-note">Quantity = number of names you enter above (one name tag each).</p>
+          ` : `
           <div class="field-row qty-row">
             <label for="productQty">Quantity</label>
             <input id="productQty" type="number" min="1" value="1" style="width: 70px; text-align: center;">
           </div>
+          `}
 
           <button type="button" class="btn btn-primary btn-block" id="productAddBtn">Add to cart</button>
         </div>
@@ -315,7 +319,8 @@ function renderProductPage() {
       const theme = detailEl.querySelector('input[name="pack-theme"]:checked')?.value || "";
       const childName = (document.getElementById("childName")?.value || "").trim();
       const childAge = (document.getElementById("childAge")?.value || "").trim();
-      const qty = parseInt(document.getElementById("productQty")?.value || "1", 10) || 1;
+      const qtyInput = document.getElementById("productQty");
+      const qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : 1;
 
       if (!theme) {
         alert("Please choose a pack theme.");
@@ -346,6 +351,10 @@ function renderProductPage() {
           .split(/\r?\n/)
           .map((s) => s.trim())
           .filter(Boolean);
+        if (tagNamesList.length === 0) {
+          alert("Please enter at least one name for the name tags (one per line).");
+          return;
+        }
       }
 
       // 整理给商家看的个性化信息
@@ -359,8 +368,9 @@ function renderProductPage() {
 
       const personaliseText = parts.join(" | ");
 
-      // 若有多个 name tag，件数按 name tag 数量；否则用 Qty
-      const finalQty = tagNamesList.length > 0 ? tagNamesList.length * qty : qty;
+      // 多名字商品：数量 = 名字个数（不再乘 Quantity）
+      // 普通商品：用 Quantity
+      const finalQty = product.multiName ? tagNamesList.length : qty;
       addToCart(product, personaliseText, finalQty);
 
       addBtn.textContent = "Added ✓";
