@@ -319,6 +319,7 @@ function renderProducts() {
         if (panel) {
           panel.hidden = false;
           btn.hidden = true;
+          btn.style.display = "none"; // 确保完全隐藏，不出现两个按钮
           panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       });
@@ -330,7 +331,10 @@ function renderProducts() {
         const panel = document.getElementById(`customisePanel-${id}`);
         const openBtn = document.getElementById(`openCustomise-${id}`);
         if (panel) panel.hidden = true;
-        if (openBtn) openBtn.hidden = false;
+        if (openBtn) {
+          openBtn.hidden = false;
+          openBtn.style.display = "";
+        }
 
         const input = document.getElementById(`personalise-${id}`);
         if (input) input.value = "";
@@ -429,12 +433,15 @@ function renderProducts() {
         const addBtnEl = document.getElementById(`addBtn-${product.id}`);
         if (addBtnEl) addBtnEl.textContent = "Add to cart";
 
-        // 加购成功后收起自定义面板
+        // 加购成功后收起自定义面板，恢复 Customise 按钮
         if (product.chooseOptions) {
           const panel = document.getElementById(`customisePanel-${product.id}`);
           const openBtn = document.getElementById(`openCustomise-${product.id}`);
           if (panel) panel.hidden = true;
-          if (openBtn) openBtn.hidden = false;
+          if (openBtn) {
+            openBtn.hidden = false;
+            openBtn.style.display = "";
+          }
         }
       });
     });

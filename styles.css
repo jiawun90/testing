@@ -289,6 +289,9 @@ em { font-style: italic; color: var(--gold); }
 .customise-panel[hidden] {
   display: none !important;
 }
+.btn-customise[hidden] {
+  display: none !important;
+}
 .customise-actions {
   display: flex;
   flex-direction: row;
