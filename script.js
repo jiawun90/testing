@@ -10,13 +10,13 @@
 const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // S$100.00 — 未满这个金额收运费
 const SHIPPING_FEE_CENTS = 500; // S$5.00 — 未满门槛时收取的固定运费
 
-// 礼包主题（暂时命名，之后可改成实际主题名）
+// 礼包主题（对应名字卡设计图）
 const PACK_THEMES = [
-  { id: "theme-a", label: "Theme A" },
-  { id: "theme-b", label: "Theme B" },
-  { id: "theme-c", label: "Theme C" },
-  { id: "theme-d", label: "Theme D" },
-  { id: "theme-e", label: "Theme E" },
+  { id: "astro", label: "Space", image: "images/theme-astro.webp" },
+  { id: "dino", label: "Dino", image: "images/theme-dino.webp" },
+  { id: "mermaid", label: "Mermaid", image: "images/theme-mermaid.webp" },
+  { id: "safari", label: "Safari", image: "images/theme-safari.webp" },
+  { id: "unicorn", label: "Unicorn", image: "images/theme-unicorn.webp" },
 ];
 
 const PRODUCTS = [
@@ -62,6 +62,8 @@ const PRODUCTS = [
     priceCents: 680,
     priceLabel: "S$6.80",
     image: "images/product-routine-space.jpg",
+    // 此商品有真实主题图，商品页显示主题缩略图 + 名字/岁数实时预览
+    hasThemePreview: true,
   },
   {
     id: "routine-charm-pack",
@@ -208,10 +210,14 @@ function renderProductPage() {
 
   document.title = `${product.name} — JW Just Wishes`;
 
+  // 主题选项：有预览图的商品显示缩略图，其它只显示文字
   const themesHtml = PACK_THEMES.map((t, i) => `
-    <label class="theme-option">
-      <input type="radio" name="pack-theme" value="${t.label}" ${i === 0 ? "checked" : ""}>
-      <span class="theme-card">${t.label}</span>
+    <label class="theme-option ${product.hasThemePreview ? "theme-option-thumb" : ""}">
+      <input type="radio" name="pack-theme" value="${t.label}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
+      ${product.hasThemePreview && t.image
+        ? `<span class="theme-thumb"><img src="${t.image}" alt="${t.label}"><span class="theme-thumb-label">${t.label}</span></span>`
+        : `<span class="theme-card">${t.label}</span>`
+      }
     </label>`).join("");
 
   const keepsakesHtml = product.chooseOptions
@@ -238,6 +244,22 @@ function renderProductPage() {
     </div>`
     : "";
 
+  // 仅 Magic Routine Spark Pack 显示真实主题图 + 名字/岁数叠加预览
+  const previewHtml = product.hasThemePreview
+    ? `
+    <div class="name-card-preview theme-image-preview" id="nameCardPreview" aria-live="polite">
+      <p class="preview-label">Live preview</p>
+      <div class="theme-preview-frame">
+        <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
+        <div class="theme-preview-overlay">
+          <p class="preview-name" id="previewName">Your name</p>
+          <p class="preview-age" id="previewAge">Age —</p>
+        </div>
+      </div>
+      <p class="field-helper">Preview updates as you type. Final print may vary slightly.</p>
+    </div>`
+    : "";
+
   detailEl.innerHTML = `
     <div class="product-detail-layout">
       <div class="product-detail-media">
@@ -251,7 +273,7 @@ function renderProductPage() {
         <div class="product-form">
           <div class="field-row">
             <label>Pack theme</label>
-            <div class="theme-options" id="themeOptions">
+            <div class="theme-options ${product.hasThemePreview ? "theme-options-thumbs" : ""}" id="themeOptions">
               ${themesHtml}
             </div>
           </div>
@@ -267,6 +289,8 @@ function renderProductPage() {
             <input id="childAge" type="text" inputmode="numeric" placeholder="e.g. 5" autocomplete="off" style="max-width: 120px;">
             <p class="field-helper">Used on the age card / print materials.</p>
           </div>
+
+          ${previewHtml}
 
           ${keepsakesHtml}
           ${multiNameHtml}
@@ -299,6 +323,41 @@ function renderProductPage() {
       });
     });
   });
+
+  // 实时预览：名字 / 岁数 +（有主题图时）切换背景图
+  const childNameInput = document.getElementById("childName");
+  const childAgeInput = document.getElementById("childAge");
+  const previewName = document.getElementById("previewName");
+  const previewAge = document.getElementById("previewAge");
+  const themePreviewImg = document.getElementById("themePreviewImg");
+
+  const updatePreview = () => {
+    const n = (childNameInput?.value || "").trim();
+    const a = (childAgeInput?.value || "").trim();
+    if (previewName) {
+      previewName.textContent = n || "Your name";
+      previewName.classList.toggle("is-placeholder", !n);
+    }
+    if (previewAge) {
+      previewAge.textContent = a ? (a.match(/^\d+$/) ? `${a}` : a) : "—";
+      previewAge.classList.toggle("is-placeholder", !a);
+    }
+  };
+
+  const updateThemeImage = () => {
+    if (!themePreviewImg) return;
+    const selected = detailEl.querySelector('input[name="pack-theme"]:checked');
+    const imgSrc = selected?.dataset?.themeImage;
+    if (imgSrc) themePreviewImg.src = imgSrc;
+  };
+
+  if (childNameInput) childNameInput.addEventListener("input", updatePreview);
+  if (childAgeInput) childAgeInput.addEventListener("input", updatePreview);
+  detailEl.querySelectorAll('input[name="pack-theme"]').forEach((radio) => {
+    radio.addEventListener("change", updateThemeImage);
+  });
+  updatePreview();
+  updateThemeImage();
 
   // 多名字计数
   const tagNames = document.getElementById("tagNames");

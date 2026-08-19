@@ -1080,3 +1080,152 @@ a.product-card-link:hover {
 #productAddBtn {
   margin-top: 0.5em;
 }
+
+/* ==================== Name card live preview ==================== */
+.name-card-preview {
+  margin: 0.5em 0 1.2em;
+}
+.preview-label {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--olive-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.45em;
+}
+.name-card-mock {
+  background: linear-gradient(145deg, #fffdf8 0%, #f3ebe0 100%);
+  border: 1.5px solid rgba(183,150,95,.4);
+  border-radius: 14px;
+  padding: 1.4em 1.2em 1.2em;
+  text-align: center;
+  box-shadow: 0 4px 18px rgba(44, 39, 29, 0.08);
+  max-width: 320px;
+}
+.mock-eyebrow {
+  font-size: .72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.5em;
+  font-weight: 600;
+}
+.mock-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  color: var(--olive);
+  margin: 0 0 0.35em;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.mock-name.is-placeholder {
+  color: rgba(63, 74, 50, 0.35);
+  font-style: italic;
+}
+.mock-age {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.mock-age.is-placeholder {
+  color: rgba(44, 39, 29, 0.35);
+}
+
+/* ==================== Theme thumbnails + image preview ==================== */
+.theme-options-thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.45em;
+}
+@media (max-width: 520px) {
+  .theme-options-thumbs {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.theme-option-thumb .theme-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25em;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  background: var(--cream);
+  transition: border-color .15s, box-shadow .15s;
+}
+.theme-option-thumb .theme-thumb img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+}
+.theme-thumb-label {
+  font-size: .7rem;
+  font-weight: 600;
+  padding: 0.15em 0.3em 0.35em;
+  color: var(--olive);
+}
+.theme-option-thumb input:checked + .theme-thumb {
+  border-color: var(--olive);
+  box-shadow: 0 0 0 2px rgba(63, 74, 50, 0.15);
+}
+.theme-option-thumb:hover .theme-thumb {
+  border-color: var(--gold);
+}
+
+.theme-image-preview .theme-preview-frame {
+  position: relative;
+  max-width: 280px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid rgba(183,150,95,.35);
+  box-shadow: 0 6px 20px rgba(44, 39, 29, 0.1);
+  background: #eee;
+}
+.theme-preview-frame img {
+  width: 100%;
+  display: block;
+  vertical-align: top;
+}
+.theme-preview-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4em 0.8em;
+  pointer-events: none;
+  text-align: center;
+}
+.theme-preview-overlay .preview-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.45), 0 0 2px rgba(0,0,0,.3);
+  margin: 0;
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 90%;
+}
+.theme-preview-overlay .preview-name.is-placeholder {
+  opacity: 0.55;
+  font-style: italic;
+}
+.theme-preview-overlay .preview-age {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  margin: 0.15em 0 0;
+  line-height: 1;
+}
+.theme-preview-overlay .preview-age.is-placeholder {
+  opacity: 0.45;
+}
