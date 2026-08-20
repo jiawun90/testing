@@ -1190,8 +1190,35 @@ a.product-card-link:hover {
   display: block;
   vertical-align: top;
 }
-/* 名字 / 岁数各自绝对定位，位置由 JS 按主题写入 */
-.theme-preview-frame .preview-name,
+/* 名字（弧形 SVG）/ 岁数：绝对定位，位置由 JS 按主题写入 */
+.theme-preview-frame .preview-name-wrap {
+  position: absolute;
+  width: 88%;
+  max-width: 260px;
+  height: auto;
+  pointer-events: none;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+.theme-preview-frame .preview-name-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.theme-preview-frame .preview-name-text,
+.theme-preview-frame .preview-name-text textPath {
+  fill: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.45));
+}
+.theme-preview-frame .preview-name-wrap.is-placeholder .preview-name-text,
+.theme-preview-frame .preview-name-wrap.is-placeholder textPath {
+  fill: rgba(255,255,255,0.55);
+  font-style: italic;
+}
 .theme-preview-frame .preview-age {
   position: absolute;
   margin: 0;
@@ -1207,10 +1234,6 @@ a.product-card-link:hover {
   pointer-events: none;
   z-index: 2;
 }
-.theme-preview-frame .preview-name {
-  font-size: 23px; /* ~23pt，预览卡上的名字 */
-}
-.theme-preview-frame .preview-name.is-placeholder,
 .theme-preview-frame .preview-age.is-placeholder {
   opacity: 0.5;
   font-style: italic;

@@ -322,7 +322,16 @@ function renderProductPage() {
       <p class="preview-label">Name card preview</p>
       <div class="theme-preview-frame">
         <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
-        <p class="preview-name" id="previewName">Your name</p>
+        <div class="preview-name-wrap" id="previewNameWrap">
+          <svg class="preview-name-svg" id="previewNameSvg" viewBox="0 0 300 70" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <path id="nameArcPath" d="M 20,55 Q 150,5 280,55" fill="none"/>
+            </defs>
+            <text class="preview-name-text">
+              <textPath href="#nameArcPath" startOffset="50%" text-anchor="middle" id="previewNamePath">Your name</textPath>
+            </text>
+          </svg>
+        </div>
         <p class="preview-age" id="previewAge">—</p>
         <img class="preview-age-img" id="previewAgeImg" alt="Age" hidden>
       </div>
@@ -446,7 +455,9 @@ function renderProductPage() {
   // 实时预览：名字 / 岁数 +（有主题图时）切换背景图
   const childNameInput = document.getElementById("childName");
   const childAgeInput = document.getElementById("childAge");
-  const previewName = document.getElementById("previewName");
+  const previewNameWrap = document.getElementById("previewNameWrap");
+  const previewNamePath = document.getElementById("previewNamePath");
+  const previewNameSvg = document.getElementById("previewNameSvg");
   const previewAge = document.getElementById("previewAge");
   const previewAgeImg = document.getElementById("previewAgeImg");
   const themePreviewImg = document.getElementById("themePreviewImg");
@@ -454,6 +465,14 @@ function renderProductPage() {
   const bagPreviewName = document.getElementById("bagPreviewName");
   const bagPreviewAge = document.getElementById("bagPreviewAge");
   const bagPreviewAgeImg = document.getElementById("bagPreviewAgeImg");
+
+  // 弧形名字：写入 SVG textPath
+  const setArcName = (raw, isPlaceholder) => {
+    if (!previewNamePath) return;
+    const t = (raw || "").trim() || "Your name";
+    previewNamePath.textContent = t;
+    if (previewNameWrap) previewNameWrap.classList.toggle("is-placeholder", !!isPlaceholder);
+  };
 
   const getSelectedThemeId = () =>
     detailEl.querySelector('input[name="pack-theme"]:checked')?.dataset?.themeId || "";
@@ -482,10 +501,7 @@ function renderProductPage() {
     const n = (childNameInput?.value || "").trim();
     const a = (childAgeInput?.value || "").trim();
     // 主题卡预览
-    if (previewName) {
-      previewName.textContent = n || "Your name";
-      previewName.classList.toggle("is-placeholder", !n);
-    }
+    setArcName(n || "Your name", !n);
     updateAgeDisplay(previewAge, previewAgeImg, a, false);
     // 袋子正面预览（只有正面有名字/岁数）
     if (bagPreviewName) {
@@ -512,7 +528,7 @@ function renderProductPage() {
     // 按主题切换名字/岁数位置（文字与插图共用）
     const theme = PACK_THEMES.find((t) => t.id === themeId) || PACK_THEMES[0];
     if (theme?.overlay) {
-      applyOverlayPosition(previewName, theme.overlay.name);
+      applyOverlayPosition(previewNameWrap, theme.overlay.name);
       applyOverlayPosition(previewAge, theme.overlay.age);
       applyOverlayPosition(previewAgeImg, theme.overlay.age);
     }
@@ -533,7 +549,15 @@ function renderProductPage() {
     const font = NAME_FONTS.find((f) => f.id === fontId) || NAME_FONTS[0];
     const family = font.family;
     const weight = font.weight || "600";
-    [previewName, previewAge, bagPreviewName, bagPreviewAge].forEach((el) => {
+    // SVG 弧形名字
+    if (previewNamePath) {
+      previewNamePath.style.fontFamily = family;
+      previewNamePath.style.fontWeight = weight;
+    }
+    if (previewNameSvg) {
+      previewNameSvg.style.fontFamily = family;
+    }
+    [previewAge, bagPreviewName, bagPreviewAge].forEach((el) => {
       if (el) {
         el.style.fontFamily = family;
         el.style.fontWeight = weight;
