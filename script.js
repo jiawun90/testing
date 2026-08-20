@@ -34,7 +34,7 @@ const AGE_IMAGES_BY_THEME = {
   },
   // dino: { "1": "images/ages/dino/01.png", ... },
   
-  dino: {
+   dino: {
     "1": "images/ages/dino/dino-01.png",
     "2": "images/ages/dino/dino-02.png",
     "3": "images/ages/dino/dino-03.png",
@@ -57,6 +57,18 @@ safari: {
     "8": "images/ages/safari/safari-08.png",
     "9": "images/ages/safari/safari-09.png",
   },
+  
+  safari: {
+    "1": "images/ages/unicorn/unicorn-01.png",
+    "2": "images/ages/unicorn/unicorn-02.png",
+    "3": "images/ages/unicorn/unicorn-03.png",
+    "4": "images/ages/unicorn/unicorn-04.png",
+    "5": "images/ages/unicorn/unicorn-05.png",
+    "6": "images/ages/unicorn/unicorn-06.png",
+    "7": "images/ages/unicorn/unicorn-07.png",
+    "8": "images/ages/unicorn/unicorn-08.png",
+    "9": "images/ages/unicorn/unicorn-09.png",
+  },
 };
 
 
@@ -69,7 +81,7 @@ const PACK_THEMES = [
     image: "images/themes/theme-astro.webp",
     overlay: {
       name: { top: "42%", left: "50%", fontSize: "23px" },
-      age:  { top: "52%", left: "50%", fontSize: "2.4rem" },
+      age:  { top: "54%", left: "50%", fontSize: "2.4rem" },
     },
   },
   {
@@ -77,12 +89,12 @@ const PACK_THEMES = [
     label: "Dino",
     image: "images/themes/theme-dino.webp",
     overlay: {
-      name: { top: "48%", left: "50%", fontSize: "23px" },
+      name: { top: "50%", left: "50%", fontSize: "23px" },
       age:  {
       top: "65%", left: "80%",
       fontSize: "1.6rem",
-      maxWidth: "40%",   // 只影响这个主题的岁数图
-      maxHeight: "32%",
+      maxWidth: "44%",   // 只影响这个主题的岁数图
+      maxHeight: "36%",
     },
   },
 },
@@ -318,10 +330,13 @@ function renderProductPage() {
 
   // 主题选项：有预览图的商品显示缩略图，其它只显示文字
   const themesHtml = PACK_THEMES.map((t, i) => `
-  <label class="theme-option">
-    <input type="radio" name="pack-theme" value="${t.label}" data-theme-id="${t.id}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
-    <span class="theme-card">${t.label}</span>
-  </label>`).join("");
+    <label class="theme-option ${product.hasThemePreview ? "theme-option-thumb" : ""}">
+      <input type="radio" name="pack-theme" value="${t.label}" data-theme-id="${t.id}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
+      ${product.hasThemePreview && t.image
+        ? `<span class="theme-thumb"><img src="${t.image}" alt="${t.label}"><span class="theme-thumb-label">${t.label}</span></span>`
+        : `<span class="theme-card">${t.label}</span>`
+      }
+    </label>`).join("");
 
   const keepsakesHtml = product.chooseOptions
     ? `
@@ -351,13 +366,13 @@ function renderProductPage() {
   const previewHtml = product.hasThemePreview
     ? `
     <div class="name-card-preview theme-image-preview" id="nameCardPreview" aria-live="polite">
-      <p class="preview-label">Wish card preview</p>
+      <p class="preview-label">Name card preview</p>
       <div class="theme-preview-frame">
         <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
         <div class="preview-name-wrap" id="previewNameWrap">
           <svg class="preview-name-svg" id="previewNameSvg" viewBox="0 0 300 70" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
-              <path id="nameArcPath" d="M 20,55 Q 150,-85 280,55" fill="none"/>
+              <path id="nameArcPath" d="M 20,55 Q 150,-90 280,55" fill="none"/>
             </defs>
             <text class="preview-name-text">
               <textPath href="#nameArcPath" startOffset="50%" text-anchor="middle" id="previewNamePath">Your name</textPath>
@@ -367,7 +382,7 @@ function renderProductPage() {
         <p class="preview-age" id="previewAge">—</p>
         <img class="preview-age-img" id="previewAgeImg" alt="Age" hidden>
       </div>
-      <p class="field-helper">Preview updates as you type. Final print may vary slightly.</p>
+      <p class="field-helper">Preview only — final print uses our design fonts. Arc and position are approximate.</p>
     </div>`
     : "";
 
@@ -437,18 +452,6 @@ function renderProductPage() {
             <p class="field-helper">Used on the age card / print materials.</p>
           </div>
 
-          ${product.hasThemePreview ? `
-          <div class="field-row">
-            <label>Name font</label>
-            <div class="font-options" id="fontOptions">
-              ${NAME_FONTS.map((f, i) => `
-                <label class="font-option">
-                  <input type="radio" name="name-font" value="${f.id}" data-font-family="${f.family}" data-font-weight="${f.weight || "600"}" ${i === 0 ? "checked" : ""}>
-                  <span class="font-swatch" style="font-family: ${f.family}; font-weight: ${f.weight || "600"}">${f.label}</span>
-                </label>`).join("")}
-            </div>
-          </div>` : ""}
-
           ${previewHtml}
           ${bagPreviewHtml}
 
@@ -499,13 +502,15 @@ function renderProductPage() {
   const bagPreviewAgeImg = document.getElementById("bagPreviewAgeImg");
 
   // 弧形名字：写入 SVG textPath
-  const setArcName = (raw, isPlaceholder) => {
+   const setArcName = (raw, isPlaceholder) => {
     if (!previewNamePath) return;
-    const t = (raw || "").trim() || "Your name";
+    const name = (raw || "").trim();
+    // 顾客只填名字，预览自动加 Turns（如 Estelle Turns）
+    const t = name ? `${name} Turns` : "Your name Turns";
     previewNamePath.textContent = t;
     if (previewNameWrap) previewNameWrap.classList.toggle("is-placeholder", !!isPlaceholder);
   };
-
+  
   const getSelectedThemeId = () =>
     detailEl.querySelector('input[name="pack-theme"]:checked')?.dataset?.themeId || "";
 
@@ -543,7 +548,7 @@ function renderProductPage() {
     updateAgeDisplay(bagPreviewAge, bagPreviewAgeImg, a, true);
   };
 
-  function applyOverlayPosition(el, pos) {
+ function applyOverlayPosition(el, pos) {
   if (!el || !pos) return;
   if (pos.top) el.style.top = pos.top;
   if (pos.left) el.style.left = pos.left;
@@ -577,34 +582,8 @@ function renderProductPage() {
     });
   });
 
-  const applyFont = () => {
-    const selected = detailEl.querySelector('input[name="name-font"]:checked');
-    const fontId = selected?.value || NAME_FONTS[0].id;
-    const font = NAME_FONTS.find((f) => f.id === fontId) || NAME_FONTS[0];
-    const family = font.family;
-    const weight = font.weight || "600";
-    // SVG 弧形名字
-    if (previewNamePath) {
-      previewNamePath.style.fontFamily = family;
-      previewNamePath.style.fontWeight = weight;
-    }
-    if (previewNameSvg) {
-      previewNameSvg.style.fontFamily = family;
-    }
-    [previewAge, bagPreviewName, bagPreviewAge].forEach((el) => {
-      if (el) {
-        el.style.fontFamily = family;
-        el.style.fontWeight = weight;
-      }
-    });
-  };
-  detailEl.querySelectorAll('input[name="name-font"]').forEach((radio) => {
-    radio.addEventListener("change", applyFont);
-  });
-
   updatePreview();
   updateThemeImage();
-  applyFont();
 
   // 袋子正反面翻转
   const bagFlipCard = document.getElementById("bagFlipCard");
@@ -675,16 +654,12 @@ function renderProductPage() {
         }
       }
 
-      const fontId = detailEl.querySelector('input[name="name-font"]:checked')?.value || "";
-      const fontLabel = NAME_FONTS.find((f) => f.id === fontId)?.label || fontId;
-
       // 整理给商家看的个性化信息
       const parts = [
         `Theme: ${theme}`,
         `Child: ${childName}`,
         `Age: ${childAge}`,
       ];
-      if (fontLabel) parts.push(`Font: ${fontLabel}`);
       if (selections.length) parts.push(`Keepsakes: ${selections.join(", ")}`);
       if (tagNamesList.length) parts.push(`Name tags (${tagNamesList.length}): ${tagNamesList.join(", ")}`);
 
