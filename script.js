@@ -12,24 +12,25 @@ const SHIPPING_FEE_CENTS = 500; // S$5.00 — 未满门槛时收取的固定运�
 
 // 名字卡字体选项（预览 + 下单备注）
 const NAME_FONTS = [
-  { id: "fraunces", label: "Elegant", family: "'Fraunces', serif" },
-  { id: "fredoka", label: "Playful", family: "'Fredoka', sans-serif" },
-  { id: "pacifico", label: "Script", family: "'Pacifico', cursive" },
+  { id: "fraunces", label: "Elegant", family: "'Fraunces', serif", weight: "600" },
+  { id: "fredoka", label: "Playful", family: "'Fredoka', sans-serif", weight: "600" },
+  { id: "pacifico", label: "Script", family: "'Pacifico', cursive", weight: "400" },
+  { id: "nunito", label: "Rounded", family: "'Nunito', sans-serif", weight: "600" }, // Semibold ≈ VAG Rounded feel
 ];
 
 // 各主题的岁数插图（key = 主题 id）
 // 路径约定：images/ages/{theme}/01.png … 09.png
 const AGE_IMAGES_BY_THEME = {
   astro: {
-    "1": "images/ages/space/01.png",
-    "2": "images/ages/space/02.png",
-    "3": "images/ages/space/03.png",
-    "4": "images/ages/space/04.png",
-    "5": "images/ages/space/05.png",
-    "6": "images/ages/space/06.png",
-    "7": "images/ages/space/07.png",
-    "8": "images/ages/space/08.png",
-    "9": "images/ages/space/09.png",
+    "1": "images/ages/space/Space-01.png",
+    "2": "images/ages/space/Space-02.png",
+    "3": "images/ages/space/Space-03.png",
+    "4": "images/ages/space/Space-04.png",
+    "5": "images/ages/space/Space-05.png",
+    "6": "images/ages/space/Space-06.png",
+    "7": "images/ages/space/Space-07.png",
+    "8": "images/ages/space/Space-08.png",
+    "9": "images/ages/space/Space-09.png",
   },
   // dino: { "1": "images/ages/dino/01.png", ... },
 };
@@ -40,7 +41,7 @@ const PACK_THEMES = [
   {
     id: "astro",
     label: "Space",
-    image: "images/themes/space.webp",
+    image: "images/themes/theme-astro.webp",
     overlay: {
       name: { top: "18%", left: "50%", fontSize: "23px" },
       age:  { top: "58%", left: "50%", fontSize: "2.4rem" },
@@ -49,7 +50,7 @@ const PACK_THEMES = [
   {
     id: "dino",
     label: "Dino",
-    image: "images/themes/dino.webp",
+    image: "images/themes/theme-dino.webp",
     overlay: {
       name: { top: "22%", left: "50%", fontSize: "23px" },
       age:  { top: "42%", left: "72%", fontSize: "2.2rem" },
@@ -58,7 +59,7 @@ const PACK_THEMES = [
   {
     id: "mermaid",
     label: "Mermaid",
-    image: "images/themes/mermaid.webp",
+    image: "images/themes/theme-mermaid.webp",
     overlay: {
       name: { top: "58%", left: "32%", fontSize: "23px" },
       age:  { top: "72%", left: "32%", fontSize: "1.5rem" },
@@ -67,7 +68,7 @@ const PACK_THEMES = [
   {
     id: "safari",
     label: "Safari",
-    image: "images/themes/safari.webp",
+    image: "images/themes/theme-safari.webp",
     overlay: {
       name: { top: "48%", left: "50%", fontSize: "23px" },
       age:  { top: "60%", left: "58%", fontSize: "1.6rem" },
@@ -76,7 +77,7 @@ const PACK_THEMES = [
   {
     id: "unicorn",
     label: "Unicorn",
-    image: "images/themes/unicorn.webp",
+    image: "images/themes/theme-unicorn.webp",
     overlay: {
       name: { top: "42%", left: "50%", fontSize: "23px" },
       age:  { top: "58%", left: "50%", fontSize: "2rem" },
@@ -108,7 +109,7 @@ const PRODUCTS = [
         "Desk Organizer",
       ],
     },
-    image: "images/products/signature-3d-wonder-box.jpg",
+    image: "images/products/product-3d-keepsake-box.jpg",
   },
   {
     id: "engraved-canvas-pack",
@@ -117,7 +118,7 @@ const PRODUCTS = [
     desc: "Curated goodie bag: paint-your-own laser-engraved magnet, colour-your-own hand fan, bubble blower and an acrylic marker.",
     priceCents: 580,
     priceLabel: "S$5.80",
-    image: "images/products/engraved-canvas-pack.jpg",
+    image: "images/products/product-favor-bag.jpg",
   },
   {
     id: "routine-spark-pack",
@@ -126,7 +127,7 @@ const PRODUCTS = [
     desc: "Curated goodie bag: 3D-printed routine checklist, multi-colour pen, mini notebook and a magnetic bookmark.",
     priceCents: 680,
     priceLabel: "S$6.80",
-    image: "images/products/routine-spark-pack.jpg",
+    image: "images/products/product-routine-space.jpg",
     // 主题卡预览（与 Charm Pack 共用主题）
     hasThemePreview: true,
   },
@@ -137,12 +138,12 @@ const PRODUCTS = [
     desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band. Includes a printed gift bag (front & back design).",
     priceCents: 880,
     priceLabel: "S$8.80",
-    image: "images/products/routine-charm-pack.jpg",
+    image: "images/products/product-routine-sunshine.jpg",
     // 主题卡预览（共用）+ 袋子正反面预览
     hasThemePreview: true,
     hasBagPreview: true,
-    bagFront: "images/bags/charm-front.webp",
-    bagBack: "images/bags/charm-back.webp",
+    bagFront: "images/bags/bag-charm-front.webp",
+    bagBack: "images/bags/bag-charm-back.webp",
   },
 ];
 
@@ -401,8 +402,8 @@ function renderProductPage() {
             <div class="font-options" id="fontOptions">
               ${NAME_FONTS.map((f, i) => `
                 <label class="font-option">
-                  <input type="radio" name="name-font" value="${f.id}" data-font-family="${f.family}" ${i === 0 ? "checked" : ""}>
-                  <span class="font-swatch" style="font-family: ${f.family}">${f.label}</span>
+                  <input type="radio" name="name-font" value="${f.id}" data-font-family="${f.family}" data-font-weight="${f.weight || "600"}" ${i === 0 ? "checked" : ""}>
+                  <span class="font-swatch" style="font-family: ${f.family}; font-weight: ${f.weight || "600"}">${f.label}</span>
                 </label>`).join("")}
             </div>
           </div>` : ""}
@@ -528,9 +529,15 @@ function renderProductPage() {
 
   const applyFont = () => {
     const selected = detailEl.querySelector('input[name="name-font"]:checked');
-    const family = selected?.dataset?.fontFamily || NAME_FONTS[0].family;
+    const fontId = selected?.value || NAME_FONTS[0].id;
+    const font = NAME_FONTS.find((f) => f.id === fontId) || NAME_FONTS[0];
+    const family = font.family;
+    const weight = font.weight || "600";
     [previewName, previewAge, bagPreviewName, bagPreviewAge].forEach((el) => {
-      if (el) el.style.fontFamily = family;
+      if (el) {
+        el.style.fontFamily = family;
+        el.style.fontWeight = weight;
+      }
     });
   };
   detailEl.querySelectorAll('input[name="name-font"]').forEach((radio) => {
