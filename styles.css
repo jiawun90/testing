@@ -1209,7 +1209,7 @@ a.product-card-link:hover {
 .theme-preview-frame .preview-name-text,
 .theme-preview-frame .preview-name-text textPath {
   fill: #fff;
-  font-size: 28px;
+  font-size: 38px;
   font-weight: 700;
   letter-spacing: 0.02em;
   filter: drop-shadow(0 1px 3px rgba(0,0,0,.45));
@@ -1416,8 +1416,8 @@ a.product-card-link:hover {
   transform: translate(-50%, -50%);
   width: auto;
   height: auto;
-  max-width: 40%;
-  max-height: 30%;
+  max-width: 36%;
+  max-height: 26%;
   object-fit: contain;
   pointer-events: none;
   z-index: 2;

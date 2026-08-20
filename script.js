@@ -15,7 +15,7 @@ const NAME_FONTS = [
   { id: "fraunces", label: "Elegant", family: "'Fraunces', serif", weight: "600" },
   { id: "fredoka", label: "Playful", family: "'Fredoka', sans-serif", weight: "600" },
   { id: "pacifico", label: "Script", family: "'Pacifico', cursive", weight: "400" },
-  { id: "nunito", label: "Rounded", family: "'Nunito', sans-serif", weight: "600" }, // Semibold ≈ VAG Rounded feel
+  { id: "bubblegum", label: "Bubble", family: "'Bubblegum Sans', cursive", weight: "400" },
 ];
 
 // 各主题的岁数插图（key = 主题 id）
@@ -43,8 +43,8 @@ const PACK_THEMES = [
     label: "Space",
     image: "images/themes/theme-astro.webp",
     overlay: {
-      name: { top: "18%", left: "50%", fontSize: "23px" },
-      age:  { top: "58%", left: "50%", fontSize: "2.4rem" },
+      name: { top: "42%", left: "50%", fontSize: "23px" },
+      age:  { top: "52%", left: "50%", fontSize: "2.4rem" },
     },
   },
   {
@@ -52,7 +52,7 @@ const PACK_THEMES = [
     label: "Dino",
     image: "images/themes/theme-dino.webp",
     overlay: {
-      name: { top: "22%", left: "50%", fontSize: "23px" },
+      name: { top: "48%", left: "50%", fontSize: "23px" },
       age:  { top: "42%", left: "72%", fontSize: "2.2rem" },
     },
   },
@@ -283,13 +283,10 @@ function renderProductPage() {
 
   // 主题选项：有预览图的商品显示缩略图，其它只显示文字
   const themesHtml = PACK_THEMES.map((t, i) => `
-    <label class="theme-option ${product.hasThemePreview ? "theme-option-thumb" : ""}">
-      <input type="radio" name="pack-theme" value="${t.label}" data-theme-id="${t.id}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
-      ${product.hasThemePreview && t.image
-        ? `<span class="theme-thumb"><img src="${t.image}" alt="${t.label}"><span class="theme-thumb-label">${t.label}</span></span>`
-        : `<span class="theme-card">${t.label}</span>`
-      }
-    </label>`).join("");
+  <label class="theme-option">
+    <input type="radio" name="pack-theme" value="${t.label}" data-theme-id="${t.id}" data-theme-image="${t.image || ""}" ${i === 0 ? "checked" : ""}>
+    <span class="theme-card">${t.label}</span>
+  </label>`).join("");
 
   const keepsakesHtml = product.chooseOptions
     ? `
@@ -319,13 +316,13 @@ function renderProductPage() {
   const previewHtml = product.hasThemePreview
     ? `
     <div class="name-card-preview theme-image-preview" id="nameCardPreview" aria-live="polite">
-      <p class="preview-label">Name card preview</p>
+      <p class="preview-label">Wish card preview</p>
       <div class="theme-preview-frame">
         <img id="themePreviewImg" src="${PACK_THEMES[0].image}" alt="Theme preview">
         <div class="preview-name-wrap" id="previewNameWrap">
           <svg class="preview-name-svg" id="previewNameSvg" viewBox="0 0 300 70" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
-              <path id="nameArcPath" d="M 20,55 Q 150,5 280,55" fill="none"/>
+              <path id="nameArcPath" d="M 20,55 Q 150,-85 280,55" fill="none"/>
             </defs>
             <text class="preview-name-text">
               <textPath href="#nameArcPath" startOffset="50%" text-anchor="middle" id="previewNamePath">Your name</textPath>
