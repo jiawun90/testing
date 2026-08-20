@@ -33,7 +33,32 @@ const AGE_IMAGES_BY_THEME = {
     "9": "images/ages/space/Space-09.png",
   },
   // dino: { "1": "images/ages/dino/01.png", ... },
+  
+  dino: {
+    "1": "images/ages/dino/dino-01.png",
+    "2": "images/ages/dino/dino-02.png",
+    "3": "images/ages/dino/dino-03.png",
+    "4": "images/ages/dino/dino-04.png",
+    "5": "images/ages/dino/dino-05.png",
+    "6": "images/ages/dino/dino-06.png",
+    "7": "images/ages/dino/dino-07.png",
+    "8": "images/ages/dino/dino-08.png",
+    "9": "images/ages/dino/dino-09.png",
+  },
+  
+safari: {
+    "1": "images/ages/safari/safari-01.png",
+    "2": "images/ages/safari/safari-02.png",
+    "3": "images/ages/safari/safari-03.png",
+    "4": "images/ages/safari/safari-04.png",
+    "5": "images/ages/safari/safari-05.png",
+    "6": "images/ages/safari/safari-06.png",
+    "7": "images/ages/safari/safari-07.png",
+    "8": "images/ages/safari/safari-08.png",
+    "9": "images/ages/safari/safari-09.png",
+  },
 };
+
 
 // 礼包主题（对应名字卡设计图）
 // overlay: 每张卡名字/岁数位置不同（百分比 + 字号）
@@ -53,9 +78,14 @@ const PACK_THEMES = [
     image: "images/themes/theme-dino.webp",
     overlay: {
       name: { top: "48%", left: "50%", fontSize: "23px" },
-      age:  { top: "42%", left: "72%", fontSize: "2.2rem" },
+      age:  {
+      top: "65%", left: "80%",
+      fontSize: "1.6rem",
+      maxWidth: "40%",   // 只影响这个主题的岁数图
+      maxHeight: "32%",
     },
   },
+},
   {
     id: "mermaid",
     label: "Mermaid",
@@ -66,14 +96,19 @@ const PACK_THEMES = [
     },
   },
   {
-    id: "safari",
-    label: "Safari",
-    image: "images/themes/theme-safari.webp",
-    overlay: {
-      name: { top: "48%", left: "50%", fontSize: "23px" },
-      age:  { top: "60%", left: "58%", fontSize: "1.6rem" },
+  id: "safari",
+  label: "Safari",
+  image: "images/themes/theme-safari.webp",
+  overlay: {
+    name: { top: "48%", left: "50%", fontSize: "23px" },
+    age:  {
+      top: "60%", left: "52%",
+      fontSize: "1.6rem",
+      maxWidth: "30%",   // 只影响这个主题的岁数图
+      maxHeight: "22%",
     },
   },
+},
   {
     id: "unicorn",
     label: "Unicorn",
@@ -508,13 +543,15 @@ function renderProductPage() {
     updateAgeDisplay(bagPreviewAge, bagPreviewAgeImg, a, true);
   };
 
-  const applyOverlayPosition = (el, pos) => {
-    if (!el || !pos) return;
-    el.style.top = pos.top || "50%";
-    el.style.left = pos.left || "50%";
-    el.style.fontSize = pos.fontSize || "1rem";
-    el.style.transform = "translate(-50%, -50%)";
-  };
+  function applyOverlayPosition(el, pos) {
+  if (!el || !pos) return;
+  if (pos.top) el.style.top = pos.top;
+  if (pos.left) el.style.left = pos.left;
+  if (pos.fontSize) el.style.fontSize = pos.fontSize;
+  el.style.transform = "translate(-50%, -50%)";
+  if (pos.maxWidth) el.style.maxWidth = pos.maxWidth;
+  if (pos.maxHeight) el.style.maxHeight = pos.maxHeight;
+}
 
   const updateThemeImage = () => {
     const selected = detailEl.querySelector('input[name="pack-theme"]:checked');
