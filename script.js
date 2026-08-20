@@ -18,19 +18,20 @@ const NAME_FONTS = [
 ];
 
 // 各主题的岁数插图（key = 主题 id）
-// Space: Space-01.png … Space-09.png；其它主题之后再补
+// 路径约定：images/ages/{theme}/01.png … 09.png
 const AGE_IMAGES_BY_THEME = {
   astro: {
-    "1": "images/Space-01.png",
-    "2": "images/Space-02.png",
-    "3": "images/Space-03.png",
-    "4": "images/Space-04.png",
-    "5": "images/Space-05.png",
-    "6": "images/Space-06.png",
-    "7": "images/Space-07.png",
-    "8": "images/Space-08.png",
-    "9": "images/Space-09.png",
+    "1": "images/ages/space/01.png",
+    "2": "images/ages/space/02.png",
+    "3": "images/ages/space/03.png",
+    "4": "images/ages/space/04.png",
+    "5": "images/ages/space/05.png",
+    "6": "images/ages/space/06.png",
+    "7": "images/ages/space/07.png",
+    "8": "images/ages/space/08.png",
+    "9": "images/ages/space/09.png",
   },
+  // dino: { "1": "images/ages/dino/01.png", ... },
 };
 
 // 礼包主题（对应名字卡设计图）
@@ -39,7 +40,7 @@ const PACK_THEMES = [
   {
     id: "astro",
     label: "Space",
-    image: "images/theme-astro.webp",
+    image: "images/themes/space.webp",
     overlay: {
       name: { top: "18%", left: "50%", fontSize: "23px" },
       age:  { top: "58%", left: "50%", fontSize: "2.4rem" },
@@ -48,7 +49,7 @@ const PACK_THEMES = [
   {
     id: "dino",
     label: "Dino",
-    image: "images/theme-dino.webp",
+    image: "images/themes/dino.webp",
     overlay: {
       name: { top: "22%", left: "50%", fontSize: "23px" },
       age:  { top: "42%", left: "72%", fontSize: "2.2rem" },
@@ -57,7 +58,7 @@ const PACK_THEMES = [
   {
     id: "mermaid",
     label: "Mermaid",
-    image: "images/theme-mermaid.webp",
+    image: "images/themes/mermaid.webp",
     overlay: {
       name: { top: "58%", left: "32%", fontSize: "23px" },
       age:  { top: "72%", left: "32%", fontSize: "1.5rem" },
@@ -66,7 +67,7 @@ const PACK_THEMES = [
   {
     id: "safari",
     label: "Safari",
-    image: "images/theme-safari.webp",
+    image: "images/themes/safari.webp",
     overlay: {
       name: { top: "48%", left: "50%", fontSize: "23px" },
       age:  { top: "60%", left: "58%", fontSize: "1.6rem" },
@@ -75,7 +76,7 @@ const PACK_THEMES = [
   {
     id: "unicorn",
     label: "Unicorn",
-    image: "images/theme-unicorn.webp",
+    image: "images/themes/unicorn.webp",
     overlay: {
       name: { top: "42%", left: "50%", fontSize: "23px" },
       age:  { top: "58%", left: "50%", fontSize: "2rem" },
@@ -107,7 +108,7 @@ const PRODUCTS = [
         "Desk Organizer",
       ],
     },
-    image: "images/product-3d-keepsake-box.jpg",
+    image: "images/products/signature-3d-wonder-box.jpg",
   },
   {
     id: "engraved-canvas-pack",
@@ -116,7 +117,7 @@ const PRODUCTS = [
     desc: "Curated goodie bag: paint-your-own laser-engraved magnet, colour-your-own hand fan, bubble blower and an acrylic marker.",
     priceCents: 580,
     priceLabel: "S$5.80",
-    image: "images/product-favor-bag.jpg",
+    image: "images/products/engraved-canvas-pack.jpg",
   },
   {
     id: "routine-spark-pack",
@@ -125,7 +126,7 @@ const PRODUCTS = [
     desc: "Curated goodie bag: 3D-printed routine checklist, multi-colour pen, mini notebook and a magnetic bookmark.",
     priceCents: 680,
     priceLabel: "S$6.80",
-    image: "images/product-routine-space.jpg",
+    image: "images/products/routine-spark-pack.jpg",
     // 主题卡预览（与 Charm Pack 共用主题）
     hasThemePreview: true,
   },
@@ -136,12 +137,12 @@ const PRODUCTS = [
     desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band. Includes a printed gift bag (front & back design).",
     priceCents: 880,
     priceLabel: "S$8.80",
-    image: "images/product-routine-sunshine.jpg",
+    image: "images/products/routine-charm-pack.jpg",
     // 主题卡预览（共用）+ 袋子正反面预览
     hasThemePreview: true,
     hasBagPreview: true,
-    bagFront: "images/bag-charm-front.webp",
-    bagBack: "images/bag-charm-back.webp",
+    bagFront: "images/bags/charm-front.webp",
+    bagBack: "images/bags/charm-back.webp",
   },
 ];
 
