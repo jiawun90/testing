@@ -1199,7 +1199,11 @@ a.product-card-link:hover {
   pointer-events: none;
   z-index: 2;
   transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 10px;
+  padding: 1.5em 0.4em;
 }
+
 .theme-preview-frame .preview-name-svg {
   width: 100%;
   height: auto;
@@ -1218,6 +1222,34 @@ a.product-card-link:hover {
 .theme-preview-frame .preview-name-wrap.is-placeholder textPath {
   fill: rgba(255,255,255,0.55);
   font-style: italic;
+}
+/* 直线名字（nameArc: false 的主题，如 Unicorn） */
+.theme-preview-frame .preview-name-straight {
+  margin: 0;
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: #1a1a1a; /* 黑字 */
+  line-height: 1.2;
+  word-break: break-word;
+
+  /* 半透明白底 */
+  background: rgba(255, 255, 255, 0.65);   /* 最后的0.75是透明度 */
+  padding: 0.2em 0.55em;
+  border-radius: 8px;
+  display: inline-block;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.theme-preview-frame .preview-name-wrap.is-placeholder .preview-name-straight {
+  opacity: 0.55;
+  font-style: italic;
+}
+.theme-preview-frame .preview-name-svg[hidden],
+.theme-preview-frame .preview-name-straight[hidden] {
+  display: none !important;
 }
 .theme-preview-frame .preview-age {
   position: absolute;

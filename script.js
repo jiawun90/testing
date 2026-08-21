@@ -46,6 +46,18 @@ const AGE_IMAGES_BY_THEME = {
     "9": "images/ages/dino/dino-09.png",
   },
   
+   mermaid: {
+    "1": "images/ages/mermaid/mermaid-01.png",
+    "2": "images/ages/mermaid/mermaid-02.png",
+    "3": "images/ages/mermaid/mermaid-03.png",
+    "4": "images/ages/mermaid/mermaid-04.png",
+    "5": "images/ages/mermaid/mermaid-05.png",
+    "6": "images/ages/mermaid/mermaid-06.png",
+    "7": "images/ages/mermaid/mermaid-07.png",
+    "8": "images/ages/mermaid/mermaid-08.png",
+    "9": "images/ages/mermaid/mermaid-09.png",
+  },
+  
 safari: {
     "1": "images/ages/safari/safari-01.png",
     "2": "images/ages/safari/safari-02.png",
@@ -58,7 +70,7 @@ safari: {
     "9": "images/ages/safari/safari-09.png",
   },
   
-  safari: {
+  unicorn: {
     "1": "images/ages/unicorn/unicorn-01.png",
     "2": "images/ages/unicorn/unicorn-02.png",
     "3": "images/ages/unicorn/unicorn-03.png",
@@ -79,20 +91,23 @@ const PACK_THEMES = [
     id: "astro",
     label: "Space",
     image: "images/themes/theme-astro.webp",
+    nameArc: true,
+    appendTurns: true,
     overlay: {
       name: { top: "42%", left: "50%", fontSize: "23px" },
       age:  { top: "54%", left: "50%", fontSize: "2.4rem" },
+      
     },
   },
   {
     id: "dino",
     label: "Dino",
     image: "images/themes/theme-dino.webp",
+    nameArc: true,
+    appendTurns: true,
     overlay: {
-      name: { top: "50%", left: "50%", fontSize: "23px" },
-      age:  {
-      top: "65%", left: "80%",
-      fontSize: "1.6rem",
+      name: { top: "49%", left: "50%", fontSize: "23px" },
+      age:  { top: "65%", left: "80%", fontSize: "1.6rem",
       maxWidth: "44%",   // 只影响这个主题的岁数图
       maxHeight: "36%",
     },
@@ -102,22 +117,27 @@ const PACK_THEMES = [
     id: "mermaid",
     label: "Mermaid",
     image: "images/themes/theme-mermaid.webp",
+    nameArc: true,
+    appendTurns: true,
     overlay: {
-      name: { top: "58%", left: "32%", fontSize: "23px" },
-      age:  { top: "72%", left: "32%", fontSize: "1.5rem" },
+      name: { top: "25%", left: "50%", fontSize: "23px" },
+      age:  { top: "32%", left: "50%", fontSize: "1.6rem",
+      maxWidth: "38%",   // 只影响这个主题的岁数图
+      maxHeight: "30%",
     },
   },
+},
   {
   id: "safari",
   label: "Safari",
   image: "images/themes/theme-safari.webp",
+  nameArc: true,
+  appendTurns: true,
   overlay: {
-    name: { top: "48%", left: "50%", fontSize: "23px" },
-    age:  {
-      top: "60%", left: "52%",
-      fontSize: "1.6rem",
-      maxWidth: "30%",   // 只影响这个主题的岁数图
-      maxHeight: "22%",
+    name: { top: "55%", left: "50%", fontSize: "23px" },
+    age:  { top: "59%", left: "50%", fontSize: "1.6rem",
+      maxWidth: "280%",   // 只影响这个主题的岁数图
+      maxHeight: "20%",
     },
   },
 },
@@ -125,11 +145,16 @@ const PACK_THEMES = [
     id: "unicorn",
     label: "Unicorn",
     image: "images/themes/theme-unicorn.webp",
+    nameArc: false,
+    appendTurns: false,
     overlay: {
-      name: { top: "42%", left: "50%", fontSize: "23px" },
-      age:  { top: "58%", left: "50%", fontSize: "2rem" },
+      name: { top: "45%", left: "50%", fontSize: "23px" },
+      age:  { top: "70%", left: "50%", fontSize: "1.6rem",
+      maxWidth: "40%",   // 只影响这个主题的岁数图
+      maxHeight: "32%",
     },
   },
+},
 ];
 
 const PRODUCTS = [
@@ -378,6 +403,7 @@ function renderProductPage() {
               <textPath href="#nameArcPath" startOffset="50%" text-anchor="middle" id="previewNamePath">Your name</textPath>
             </text>
           </svg>
+          <p class="preview-name-straight" id="previewNameStraight">Your name Turns</p>
         </div>
         <p class="preview-age" id="previewAge">—</p>
         <img class="preview-age-img" id="previewAgeImg" alt="Age" hidden>
@@ -493,6 +519,7 @@ function renderProductPage() {
   const previewNameWrap = document.getElementById("previewNameWrap");
   const previewNamePath = document.getElementById("previewNamePath");
   const previewNameSvg = document.getElementById("previewNameSvg");
+  const previewNameStraight = document.getElementById("previewNameStraight");
   const previewAge = document.getElementById("previewAge");
   const previewAgeImg = document.getElementById("previewAgeImg");
   const themePreviewImg = document.getElementById("themePreviewImg");
@@ -502,12 +529,27 @@ function renderProductPage() {
   const bagPreviewAgeImg = document.getElementById("bagPreviewAgeImg");
 
   // 弧形名字：写入 SVG textPath
-   const setArcName = (raw, isPlaceholder) => {
-    if (!previewNamePath) return;
+    const setArcName = (raw, isPlaceholder) => {
     const name = (raw || "").trim();
-    // 顾客只填名字，预览自动加 Turns（如 Estelle Turns）
-    const t = name ? `${name} Turns` : "Your name Turns";
-    previewNamePath.textContent = t;
+    const themeId = detailEl.querySelector('input[name="pack-theme"]:checked')?.dataset?.themeId || "";
+const theme = PACK_THEMES.find((t) => t.id === themeId) || PACK_THEMES[0];
+const useArc = theme?.nameArc !== false;
+const withTurns = theme?.appendTurns !== false; // Mermaid 设 appendTurns:false 则不加 Turns
+
+const display = name
+  ? (withTurns ? `${name} Turns` : name)
+  : (withTurns ? "Your name Turns" : "Your name");
+    if (previewNamePath) previewNamePath.textContent = display;
+    if (previewNameStraight) previewNameStraight.textContent = display;
+
+  if (previewNameSvg) {
+  previewNameSvg.hidden = !useArc;
+  previewNameSvg.style.display = useArc ? "block" : "none";
+}
+  if (previewNameStraight) {
+  previewNameStraight.hidden = useArc;
+  previewNameStraight.style.display = useArc ? "none" : "block";
+}
     if (previewNameWrap) previewNameWrap.classList.toggle("is-placeholder", !!isPlaceholder);
   };
   
@@ -556,6 +598,10 @@ function renderProductPage() {
   el.style.transform = "translate(-50%, -50%)";
   if (pos.maxWidth) el.style.maxWidth = pos.maxWidth;
   if (pos.maxHeight) el.style.maxHeight = pos.maxHeight;
+  if (pos.padX || pos.padY) {
+  el.style.padding = `${pos.padY || "0.2em"} ${pos.padX || "0.5em"}`;
+}
+if (pos.bgWidth) el.style.width = pos.bgWidth;
 }
 
   const updateThemeImage = () => {
