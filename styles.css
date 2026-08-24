@@ -172,6 +172,18 @@ em { font-style: italic; color: var(--gold); }
       padding: 20px;
     }
 
+/* 移动端适配：屏幕太窄时自动变为每行 1 个或 2 个 */
+    @media (max-width: 900px) {
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
 .product-card {
   background: var(--white);
   border-radius: var(--radius);
