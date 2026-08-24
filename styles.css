@@ -157,10 +157,21 @@ em { font-style: italic; color: var(--gold); }
 
 /* ============ Shop / products ============ */
 .shop { padding: 5em 0 4em; }
-.product-grid {
+/*.product-grid {
   max-width: 1120px; margin: 2.5em auto 0; padding: 0 1.5em;
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.8em;
-}
+}*/
+
+.product-grid {
+      display: grid;
+      /* 核心代码：定义 4 列等宽 */
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 20px; /* 卡片之间的间距 */
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
 .product-card {
   background: var(--white);
   border-radius: var(--radius);
