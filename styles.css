@@ -175,8 +175,8 @@ em { font-style: italic; color: var(--gold); }
 /* 移动端适配：屏幕变窄时保持每行最少 2 个卡片 */
 @media (max-width: 900px) {
   .product-grid {
-    grid-template-columns: repeat(2, 1fr); /* 限制为 2 列 */
-    gap: 10px; /* 小屏幕上适度缩小卡片间距，避免内容太挤 */
+    grid-template-columns: repeat(2, 1fr) !important; /* 限制为 2 列 */
+    gap: 10px !important; /* 小屏幕上适度缩小卡片间距，避免内容太挤 */
   }
 }
 
