@@ -236,7 +236,7 @@ em { font-style: italic; color: var(--gold); }
 }
 .product-body { padding: 1.3em 1.3em 1.5em; display: flex; flex-direction: column; gap: .6em; flex-grow: 1; /* 撑满剩余高度 */}
 .product-body h3 { font-size: 1.15rem; margin-bottom: 0; }
-.age-label {
+.collection-label {  /* age-lable change to collection-label */
   display: block;             /* 强制自己独占一行 */
   width: fit-content;         /* 宽度适应文字大小，不会占满整行 */
   margin-top: 0.4em;          /* 与上方标题拉开一点距离 */
