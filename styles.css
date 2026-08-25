@@ -211,13 +211,13 @@ em { font-style: italic; color: var(--gold); }
 
 .product-media {
   aspect-ratio: 4/3;
-  background: #ffffff;
+  background: transparent !important; /* 彻底移除渐变和紫底 */
   display: flex; align-items: center; justify-content: center;
   color: var(--olive);
   overflow: hidden;
 }
 .product-media img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
+  width: 100%; height: 100%; object-fit: cover; display: block;background: transparent !important;
 }
 
 /* 标题统一高度（最多显示 2 行，防止高度拉长） */
@@ -1121,7 +1121,7 @@ a.product-card-link:hover {
   width: 100%;
   border-radius: var(--radius, 16px);
   object-fit: cover;
-  background: transparent;
+  background: transparent !important;
 }
 .product-detail-info h1 {
   font-family: 'Fraunces', serif;
