@@ -224,6 +224,45 @@ const PRODUCTS = [
     bagFront: "images/bags/bag-charm-front.webp",
     bagBack: "images/bags/bag-charm-back.webp",
   },
+ {
+    id: "standard-fun-pack",
+    category: "standard",
+    isPopular: false,
+    name: "Standard Fun Pack",
+    collectionLabel: "Standard Goodie Collection",
+    desc: "Fun Pack | Ages 1+ | Mini Erasable Drawing Board • Hand Press Mini Fan • Pop-It Fidget Toy • Mini Helicopter",
+    priceCents: 380,
+    priceLabel: "S$3.80",
+    image: "images/products/product-routine-sunshine.jpg",
+     // 主题卡预览（与 Charm Pack 共用主题）
+    hasThemePreview: true,
+  },
+ {
+    id: "standard-discovery-pack",
+    category: "standard",
+    isPopular: false,
+    name: "Standard Discovery Pack",
+    collectionLabel: "Standard Goodie Collection",
+    desc: "Discovery Pack | Ages 2+ | Magic Water Book • Kaleidoscope • Mosquito Repellent Band • Bubble Blower",
+    priceCents: 480,
+    priceLabel: "S4.80",
+    image: "images/products/product-routine-sunshine.jpg",
+     // 主题卡预览（与 Charm Pack 共用主题）
+    hasThemePreview: true,
+  },
+   {
+    id: "standard-creative-pack",
+    category: "standard",
+    isPopular: false,
+    name: "Standard Creative Pack",
+    collectionLabel: "Standard Goodie Collection",
+    desc: " Creative Pack | Ages 4+ | Water Color Painting • Air-Dry Clay • Plaster Painting • Push-Down Toy Car",
+    priceCents: 680,
+    priceLabel: "S6.80",
+    image: "images/products/product-routine-sunshine.jpg",
+     // 主题卡预览（与 Charm Pack 共用主题）
+    hasThemePreview: true,
+  },
 ];
 
 
