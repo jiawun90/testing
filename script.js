@@ -271,45 +271,8 @@ function formatSGD(cents) {
 }
 
 
-/*
 
-// ---------------- Render: product grid ----------------
-function renderProducts() {
-  const grid = document.getElementById("productGrid");
-  if (!grid) return; // 容错处理：如果当前页面没有 productGrid，安全退出
-
-  grid.innerHTML = PRODUCTS.map((p) => `
-    <div class="product-card" data-id="${p.id}">
-      <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ''}</div>
-      <div class="product-body">
-        <h3>${p.name}${p.ageLabel ? ` <span class="age-label">${p.ageLabel}</span>` : ""}</h3>
-        <p class="product-desc">${p.desc}</p>
-        <p class="product-price">${p.priceLabel}</p>
-        <div class="field-row">
-          <label for="personalise-${p.id}">${p.personalise.label}</label>
-          <input id="personalise-${p.id}" type="text" placeholder="${p.personalise.placeholder}">
-        </div>
-        <button class="add-btn" data-add="${p.id}">Add to cart</button>
-      </div>
-    </div>
-  `).join("");
-
-  grid.querySelectorAll("[data-add]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const product = PRODUCTS.find((p) => p.id === btn.dataset.add);
-      const input = document.getElementById(`personalise-${product.id}`);
-      addToCart(product, input ? input.value.trim() : "");
-      if (input) input.value = "";
-    });
-  });
-}
-
-*/
-
-
-
-
-// ---------------- Render: product grid (listing cards) ----------------
+/*// ---------------- Render: product grid (listing cards) ----------------
 function renderProducts() {
   const homeGrid = document.getElementById("popularGrid");
   const shopGrid = document.getElementById("productGrid");
@@ -321,15 +284,12 @@ function renderProducts() {
       <div class="product-body">
         <!-- 1. 标题 -->
         <h3 class="product-title">${p.name}</h3>
-        
         <!-- 2. 年龄标签：独立占一行（如果没有就留空，保持对齐） -->
         <div class="tag-container">
           ${p.ageLabel ? `<span class="age-label">${p.ageLabel}</span>` : `<span class="age-label placeholder-tag"></span>`}
         </div>
-
         <!-- 3. 价格 -->
         <p class="product-price">${p.priceLabel}</p>
-
         <!-- 4. 底部按钮 -->
         <span class="btn-view">View &amp; customise &rarr;</span>
       </div>
@@ -342,6 +302,62 @@ function renderProducts() {
   }
   if (shopGrid) {
     shopGrid.innerHTML = PRODUCTS.map(createListingCard).join("");
+  }
+}*/
+
+
+// ---------------- Render: product grid (listing cards) ----------------
+// 单个卡片生成模板
+const createListingCard = (p) => `
+  <a class="product-card product-card-link" href="product.html?id=${encodeURIComponent(p.id)}">
+    <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ""}</div>
+    <div class="product-body">
+      <h3 class="product-title">${p.name}</h3>
+      <div class="tag-container">
+        ${p.ageLabel ? `<span class="age-label">${p.ageLabel}</span>` : `<span class="age-label placeholder-tag"></span>`}
+      </div>
+      <p class="product-price">${p.priceLabel}</p>
+      <span class="btn-view">View &amp; customise &rarr;</span>
+    </div>
+  </a>`;
+
+function renderProducts() {
+  const homeGrid = document.getElementById("popularGrid");
+  const shopGrid = document.getElementById("productGrid");
+
+  // 1. 首页 Popular Area：显示带 isPopular: true 的前 4 个产品（或者包含特定 ID 的产品）
+  if (homeGrid) {
+    const popularItems = PRODUCTS.filter((p) => p.isPopular || p.id === "signature-3d-wonder-box").slice(0, 4);
+    homeGrid.innerHTML = popularItems.map(createListingCard).join("");
+  }
+
+  // 2. 默认加载全部商品到 Shop 区域
+  if (shopGrid) {
+    shopGrid.innerHTML = PRODUCTS.map(createListingCard).join("");
+  }
+}
+
+// ---------------- Collection 筛选逻辑 ----------------
+function filterShop(category, element) {
+  const shopGrid = document.getElementById("productGrid");
+  if (!shopGrid) return;
+
+  // 1. 切换 Collection 卡片的高亮 class
+  if (element) {
+    document.querySelectorAll('.collection-card').forEach(card => card.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  // 2. 根据 category 筛选产品数据
+  const filtered = (category === 'all' || !category)
+    ? PRODUCTS 
+    : PRODUCTS.filter(p => p.category === category);
+
+  // 3. 重新渲染 Shop 网格
+  if (filtered.length === 0) {
+    shopGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #888; padding: 2em;">No products in this category yet.</p>`;
+  } else {
+    shopGrid.innerHTML = filtered.map(createListingCard).join("");
   }
 }
 
