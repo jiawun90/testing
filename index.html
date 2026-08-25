@@ -100,7 +100,7 @@
       <p class="lede">From fully curated party packs to one-of-a-kind custom goodie bags, we make gifting effortless so you can focus on celebrating.</p>
       
       <div style="display: flex; gap: 1em; flex-wrap: wrap;">
-        <a href="shop.html" class="btn btn-primary">Explore Collection</a>
+        <a href="#collections" class="btn btn-primary">Explore Collection</a>
         <a href="how.html" class="btn" style="border: 1.6px solid var(--olive); color: var(--olive);">How It Works</a>
       </div>
     </div>
@@ -152,27 +152,6 @@
 </div>
   </section>
     
-    <!-- Right Column: Carousel -->
-    <!--
-    <div class="hero-carousel-container">
-      <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-card active">
-          <img src="images/routine-board.jpg" alt="Laser Wood Routine Board">
-          <h4>🪵 Laser Wood Routine Board</h4>
-        </div>
-        <div class="carousel-card">
-          <img src="images/macaron-bag.jpg" alt="8cm Bag Macaron">
-          <h4>🛍️ 8cm Bag (Macaron)</h4>
-        </div>
-        <div class="carousel-card">
-          <img src="images/3d-name-tag.jpg" alt="3D Name Tag">
-          <h4>🏷️ 3D Name Tag</h4>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-    -->
 
 <!-- ============ What We Bring to Your Celebration ============ -->
 <section style="padding: 2em 0 4em;">
@@ -199,6 +178,7 @@
     </div>
   </div>
 </section>
+  
 
 <!-- ============ FEATURED PRODUCTS PREVIEW ============ -->
 <section class="shop" style="background: var(--white); padding: 4em 0;">
@@ -217,7 +197,32 @@
   </div>
 </section>
 
-
+<!-- COLLECTIONS 分类卡片 -->
+<section class="collections-section" id="collections">
+  <div class="section-head">
+    <p class="eyebrow">THE CATEGORIES</p>
+    <h2>Explore Collections</h2>
+  </div>
+  
+  <div class="collection-cards-container">
+    <div class="collection-card active" onclick="filterShop('all', this)">
+      <div class="collection-icon">🎁</div>
+      <span class="collection-name">All Products</span>
+    </div>
+    <div class="collection-card" onclick="filterShop('signature', this)">
+      <div class="collection-icon">📦</div>
+      <span class="collection-name">Signature 3D</span>
+    </div>
+    <div class="collection-card" onclick="filterShop('magic-routine', this)">
+      <div class="collection-icon">✨</div>
+      <span class="collection-name">Magic Routine</span>
+    </div>
+    <div class="collection-card" onclick="filterShop('standard', this)">
+      <div class="collection-icon">🎨</div>
+      <span class="collection-name">Standard Packs</span>
+    </div>
+  </div>
+</section>
 
 <!-- ============ FINAL CTA BANNER ============ -->
 <section class="cta-banner">
