@@ -319,13 +319,23 @@ function renderProducts() {
     <a class="product-card product-card-link" href="product.html?id=${encodeURIComponent(p.id)}">
       <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ""}</div>
       <div class="product-body">
-        <h3>${p.name}${p.ageLabel ? ` <span class="age-label">${p.ageLabel}</span>` : ""}</h3>
-      
+        <!-- 1. 标题 -->
+        <h3 class="product-title">${p.name}</h3>
+        
+        <!-- 2. 年龄标签：独立占一行（如果没有就留空，保持对齐） -->
+        <div class="tag-container">
+          ${p.ageLabel ? `<span class="age-label">${p.ageLabel}</span>` : `<span class="age-label placeholder-tag"></span>`}
+        </div>
+
+        <!-- 3. 价格 -->
         <p class="product-price">${p.priceLabel}</p>
-        <span class="btn-view">View &amp; customise →</span>
+
+        <!-- 4. 底部按钮 -->
+        <span class="btn-view">View &amp; customise &rarr;</span>
       </div>
     </a>`;
-
+  
+// ---------------- Home： Popular Item Display ----------------
   if (homeGrid) {
     const popularItems = PRODUCTS.filter((p) => p.id === "signature-3d-wonder-box");
     homeGrid.innerHTML = popularItems.map(createListingCard).join("");
