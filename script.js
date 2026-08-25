@@ -158,6 +158,7 @@ const PACK_THEMES = [
 ];
 
 const PRODUCTS = [
+  /*--------P1---------*/
   {
     id: "signature-3d-wonder-box",
     category: "signature", // 对应 Collection：signature, magic-routine, 或 standard
@@ -185,36 +186,42 @@ const PRODUCTS = [
     },
     image: "images/products/product-3d-keepsake-box.jpg",
   },
+
+  /*--------P2---------*/
   {
     id: "engraved-canvas-pack",
     isPopular: true,
     name: "Engraved Canvas Pack",
     collectionLabel: "Engraved Collection",
-    desc: "Curated goodie bag: paint-your-own laser-engraved magnet, colour-your-own hand fan, bubble blower and an acrylic marker.",
+    desc: "Suitable for Ages 3+ | Paint-your-own Laser-engraved Magnet • Colour-your-own Hand Fan • Bubble Blower • Acrylic Marker",
     priceCents: 580,
     priceLabel: "S$5.80",
     image: "images/products/product-favor-bag.jpg",
   },
+  
+  /*--------P3---------*/
   {
     id: "routine-spark-pack",
     category: "magic-routine",
     isPopular: false,
     name: "Magic Routine Spark Pack",
     collectionLabel: "Magic Routine Collection",
-    desc: "Curated goodie bag: 3D-printed routine checklist, multi-colour pen, mini notebook and a magnetic bookmark.",
+    desc: "Suitable for Ages 2+ | 3D-Printed Routine Checklist • Multi-colour Pen • Mini Notebook • Magnetic Bookmark",
     priceCents: 680,
     priceLabel: "S$6.80",
     image: "images/products/product-routine-space.jpg",
     // 主题卡预览（与 Charm Pack 共用主题）
     hasThemePreview: true,
   },
+  
+  /*--------P4---------*/
   {
     id: "routine-charm-pack",
     category: "magic-routine",
     isPopular: false,
     name: "Magic Routine Charm Pack",
     collectionLabel: "Magic Routine Collection",
-    desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band. Includes a printed gift bag (front & back design).",
+    desc: "Suitable for Ages 2+ | 3D-Printed Routine Checklist • Inflatable Hammer • Foam Sticker • Kaleidoscope • Mosquito Repellent Band (Includes a printed gift bag-front & back design)",
     priceCents: 880,
     priceLabel: "S$8.80",
     image: "images/products/product-routine-sunshine.jpg",
@@ -224,39 +231,45 @@ const PRODUCTS = [
     bagFront: "images/bags/bag-charm-front.webp",
     bagBack: "images/bags/bag-charm-back.webp",
   },
+
+  /*--------P5---------*/
  {
     id: "standard-fun-pack",
     category: "standard",
     isPopular: false,
     name: "Standard Fun Pack",
     collectionLabel: "Standard Goodie Collection",
-    desc: "Fun Pack | Ages 1+ | Mini Erasable Drawing Board • Hand Press Mini Fan • Pop-It Fidget Toy • Mini Helicopter",
+    desc: "Suitable for Ages 1+ | Mini Erasable Drawing Board • Hand Press Mini Fan • Pop-It Fidget Toy • Mini Helicopter",
     priceCents: 380,
     priceLabel: "S$3.80",
     image: "images/products/product-routine-sunshine.jpg",
      // 主题卡预览（与 Charm Pack 共用主题）
     hasThemePreview: true,
   },
+
+  /*--------P6---------*/
  {
     id: "standard-discovery-pack",
     category: "standard",
     isPopular: false,
     name: "Standard Discovery Pack",
     collectionLabel: "Standard Goodie Collection",
-    desc: "Discovery Pack | Ages 2+ | Magic Water Book • Kaleidoscope • Mosquito Repellent Band • Bubble Blower",
+    desc: "Suitable for Ages 2+ | Magic Water Book • Kaleidoscope • Mosquito Repellent Band • Bubble Blower",
     priceCents: 480,
     priceLabel: "S4.80",
     image: "images/products/product-routine-sunshine.jpg",
      // 主题卡预览（与 Charm Pack 共用主题）
     hasThemePreview: true,
   },
+
+   /*--------P7---------*/
    {
     id: "standard-creative-pack",
     category: "standard",
     isPopular: false,
     name: "Standard Creative Pack",
     collectionLabel: "Standard Goodie Collection",
-    desc: " Creative Pack | Ages 4+ | Water Color Painting • Air-Dry Clay • Plaster Painting • Push-Down Toy Car",
+    desc: "Suitable for Ages 4+ | Water Color Painting • Air-Dry Clay • Plaster Painting • Push-Down Toy Car",
     priceCents: 680,
     priceLabel: "S6.80",
     image: "images/products/product-routine-sunshine.jpg",
