@@ -164,14 +164,14 @@ const PRODUCTS = [
     isPopular: true,       // true 会自动显示在 Home 的 Popular Picks 区域
     name: "Signature 3D Wonder Box",
     collectionLabel: "Signature Collection",
-    desc: "Includes a personalised 3D-printed name tag, plus your choice of ANY 2 3D-printed keepsakes: Flickering Light, Dinosaur Egg (with a baby dino inside), Milk Box Holder, or Desk Organizer.",
+    desc: "Includes a personalized 3D-printed name tag and any 2 3D-printed keepsakes of your choice",
     priceCents: 1280,
     priceLabel: "S$12.80",
     multiName: true,
     nameField: {
-      label: "Names for the name tags (classmates)",
-      placeholder: "Alicia\nMarcus\nZoe\n...(one name per line)",
-      helper: "One name per line — each gets a 3D-printed name tag."
+      label: "Personalized 3D-Printed Name Tag (Guest Name)",
+      placeholder: "Oliver\nMarcus\nZoe\n...(one guest name per line)",
+      helper: "One guest name per line — Complete with a custom 3D name tag for each guest"
     },
     chooseOptions: {
       label: "Choose any 2 keepsakes (same for all)",
