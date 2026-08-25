@@ -163,7 +163,7 @@ const PRODUCTS = [
     category: "signature", // 对应 Collection：signature, magic-routine, 或 standard
     isPopular: true,       // true 会自动显示在 Home 的 Popular Picks 区域
     name: "Signature 3D Wonder Box",
-    ageLabel: null,
+    collectionLabel: "Signature Collection",
     desc: "Includes a personalised 3D-printed name tag, plus your choice of ANY 2 3D-printed keepsakes: Flickering Light, Dinosaur Egg (with a baby dino inside), Milk Box Holder, or Desk Organizer.",
     priceCents: 1280,
     priceLabel: "S$12.80",
@@ -189,7 +189,7 @@ const PRODUCTS = [
     id: "engraved-canvas-pack",
     isPopular: true,
     name: "Engraved Canvas Pack",
-    ageLabel: "Ages 3+",
+    collectionLabel: "Engraved Collection",
     desc: "Curated goodie bag: paint-your-own laser-engraved magnet, colour-your-own hand fan, bubble blower and an acrylic marker.",
     priceCents: 580,
     priceLabel: "S$5.80",
@@ -200,7 +200,7 @@ const PRODUCTS = [
     category: "magic-routine",
     isPopular: false,
     name: "Magic Routine Spark Pack",
-    ageLabel: "Ages 2+",
+    collectionLabel: "Magic Routine Collection",
     desc: "Curated goodie bag: 3D-printed routine checklist, multi-colour pen, mini notebook and a magnetic bookmark.",
     priceCents: 680,
     priceLabel: "S$6.80",
@@ -213,7 +213,7 @@ const PRODUCTS = [
     category: "magic-routine",
     isPopular: false,
     name: "Magic Routine Charm Pack",
-    ageLabel: "Ages 2+",
+    collectionLabel: "Magic Routine Collection",
     desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band. Includes a printed gift bag (front & back design).",
     priceCents: 880,
     priceLabel: "S$8.80",
@@ -320,7 +320,7 @@ const createListingCard = (p) => `
     <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ""}</div>
     <div class="product-body">
       <div class="tag-container">
-        ${p.ageLabel ? `<span class="age-label">${p.ageLabel}</span>` : `<span class="age-label placeholder-tag"></span>`}
+        ${p.collectionLabel ? `<span class="collection-label">${p.collectionLabel}</span>` : `<span class="collection-label placeholder-tag"></span>`}
       </div>
       <h3 class="product-title">${p.name}</h3>
       <p class="product-price">${p.priceLabel}</p>
@@ -487,7 +487,7 @@ function renderProductPage() {
         ${product.image ? `<img src="${product.image}" alt="${product.name}">` : ""}
       </div>
       <div class="product-detail-info">
-        <h1>${product.name}${product.ageLabel ? ` <span class="age-label">${product.ageLabel}</span>` : ""}</h1>
+        <h1>${product.name}${product.collectionLabel ? ` <span class="collection-label">${product.collectionLabel}</span>` : ""}</h1>
         <p class="product-price product-detail-price">${product.priceLabel}</p>
         <p class="product-desc">${product.desc}</p>
 
