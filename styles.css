@@ -1121,7 +1121,7 @@ a.product-card-link:hover {
   width: 100%;
   border-radius: var(--radius, 16px);
   object-fit: cover;
-  background: var(--cream);
+  background: transparent;
 }
 .product-detail-info h1 {
   font-family: 'Fraunces', serif;
