@@ -211,7 +211,7 @@ em { font-style: italic; color: var(--gold); }
 
 .product-media {
   aspect-ratio: 4/3;
-  background: linear-gradient(135deg, var(--cream-deep), var(--gold-soft));
+  background: #ffffff;
   display: flex; align-items: center; justify-content: center;
   color: var(--olive);
   overflow: hidden;
