@@ -219,6 +219,21 @@ em { font-style: italic; color: var(--gold); }
 .product-media img {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
+
+/* 标题统一高度（最多显示 2 行，防止高度拉长） */
+.product-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--olive, #2c3e50);
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  min-height: 2.6em; /* 预留两行高度，确保单行和双行标题卡片等高 */
+}
+/* 年龄标签容器：统一高度 */
+.tag-container {
+  min-height: 24px;
+  margin-bottom: 8px;
+}
 .product-body { padding: 1.3em 1.3em 1.5em; display: flex; flex-direction: column; gap: .6em; flex-grow: 1; /* 撑满剩余高度 */}
 .product-body h3 { font-size: 1.15rem; margin-bottom: 0; }
 .age-label {
