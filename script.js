@@ -160,6 +160,8 @@ const PACK_THEMES = [
 const PRODUCTS = [
   {
     id: "signature-3d-wonder-box",
+    category: "signature", // 对应 Collection：signature, magic-routine, 或 standard
+    isPopular: true,       // true 会自动显示在 Home 的 Popular Picks 区域
     name: "Signature 3D Wonder Box",
     ageLabel: null,
     desc: "Includes a personalised 3D-printed name tag, plus your choice of ANY 2 3D-printed keepsakes: Flickering Light, Dinosaur Egg (with a baby dino inside), Milk Box Holder, or Desk Organizer.",
@@ -185,6 +187,7 @@ const PRODUCTS = [
   },
   {
     id: "engraved-canvas-pack",
+    isPopular: true,
     name: "Engraved Canvas Pack",
     ageLabel: "Ages 3+",
     desc: "Curated goodie bag: paint-your-own laser-engraved magnet, colour-your-own hand fan, bubble blower and an acrylic marker.",
@@ -194,6 +197,8 @@ const PRODUCTS = [
   },
   {
     id: "routine-spark-pack",
+    category: "magic-routine",
+    isPopular: false,
     name: "Magic Routine Spark Pack",
     ageLabel: "Ages 2+",
     desc: "Curated goodie bag: 3D-printed routine checklist, multi-colour pen, mini notebook and a magnetic bookmark.",
@@ -205,6 +210,8 @@ const PRODUCTS = [
   },
   {
     id: "routine-charm-pack",
+    category: "magic-routine",
+    isPopular: false,
     name: "Magic Routine Charm Pack",
     ageLabel: "Ages 2+",
     desc: "Curated goodie bag: 3D-printed routine checklist, inflatable hammer, foam sticker, kaleidoscope and a mosquito repellent band. Includes a printed gift bag (front & back design).",
