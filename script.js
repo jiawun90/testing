@@ -320,7 +320,7 @@ function renderProducts() {
       <div class="product-media">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : ""}</div>
       <div class="product-body">
         <h3>${p.name}${p.ageLabel ? ` <span class="age-label">${p.ageLabel}</span>` : ""}</h3>
-        <p class="product-desc listing-desc">${p.desc.length > 100 ? p.desc.slice(0, 100).trim() + "…" : p.desc}</p>
+      
         <p class="product-price">${p.priceLabel}</p>
         <span class="btn-view">View &amp; customise →</span>
       </div>
