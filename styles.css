@@ -299,6 +299,55 @@ em { font-style: italic; color: var(--gold); }
   background: rgba(63, 74, 50, 0.12);
 }
 
+/* ============ COLLECTION 图标卡片 ============ */
+.collection-cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 1.5em;
+}
+
+.collection-card {
+  width: 130px;
+  height: 120px;
+  background: var(--white, #ffffff);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 2px solid transparent;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.collection-icon {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.collection-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--olive, #2c3e50);
+}
+
+/* Collection 卡片悬停与激活高亮 */
+.collection-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.collection-card.active {
+  border-color: var(--olive, #3a4a38);
+  background: #faf8f5;
+  box-shadow: 0 8px 20px rgba(58, 74, 56, 0.12);
+}
+
+
 /* ==================== 介绍 Show more ==================== */
 .desc-block {
   margin-bottom: 0.5em;
